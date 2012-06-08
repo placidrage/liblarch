@@ -17,10 +17,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import gobject
+from gi.repository import GObject
 
-class FilteredTree():
-    """ FilteredTree is the most important and also the most buggy part of
+
+class FilteredTree(object):
+    """
+    FilteredTree is the most important and also the most buggy part of
     LibLarch.
 
     FilteredTree transforms general changes in tree like creating/removing 
@@ -35,14 +37,16 @@ class FilteredTree():
     """
 
     def __init__(self, tree, filtersbank, name=None, refresh=True):
-        """ Construct a layer where filters could by applied
+        """
+        Construct a layer where filters could by applied
 
         @param tree: Original tree to filter.
         @param filtersbank: Filter bank which stores filters
         @param refresh: Requests all nodes in the beginning? Additional
             filters can be added and refresh can be done later
 
-        _flat defines whether only nodes without children can be shown. For example WorkView filter.
+        _flat defines whether only nodes without children can be shown.
+        For example WorkView filter.
         """
 
         self.cllbcks = {}
@@ -76,7 +80,8 @@ class FilteredTree():
             
 
     def set_callback(self, event, func,node_id=None, param=None):
-        """ Register a callback for an event.
+        """
+        Register a callback for an event.
 
         It is possible to have just one callback for event.
         @param event: one of added, modified, deleted, reordered
@@ -87,7 +92,7 @@ class FilteredTree():
                 raise Exception('runonce callback should come with a node_id')
             if self.is_displayed(node_id):
                 #it is essential to idle_add to avoid hard recursion
-                gobject.idle_add(func,param)
+                GObject.idle_add(func,param)
             else:
                 if not self.cllbcks.has_key(node_id):
                     self.cllbcks[node_id] = []
@@ -711,7 +716,8 @@ class FilteredTree():
         return toreturn
 
     def unapply_filter(self, filter_name, refresh=True):
-        """ Removes a filter from the tree.
+        """
+        Removes a filter from the tree.
 
         @param filter_name: The name of an already added filter to remove
         @param refresh: Should be refereshed the whole tree?
@@ -745,3 +751,5 @@ class FilteredTree():
             self.applied_filters = []
         if refresh:
             self.refilter()
+
+# -----------------------------------------------------------------------------

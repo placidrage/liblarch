@@ -17,9 +17,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import gtk
+from gi.repository import Gtk
 
-class TreeModel(gtk.TreeStore):
+
+# -----------------------------------------------------------------------------
+
+class TreeModel(Gtk.TreeStore):
     """ Local copy of showed tree """
 
     def __init__(self, tree, types):
@@ -32,7 +35,7 @@ class TreeModel(gtk.TreeStore):
         self.types = [[str, lambda node: node.get_id()]] + types
         only_types = [python_type for python_type, access_method in self.types]
 
-        gtk.TreeStore.__init__(self, *only_types)
+        Gtk.TreeStore.__init__(self, *only_types)
         self.cache_paths = {}
         self.cache_position = {}
         self.tree = tree
@@ -66,7 +69,7 @@ class TreeModel(gtk.TreeStore):
     def my_get_iter(self, path):
         """ Because we sort the TreeStore, paths in the treestore are
         not the same as paths in the FilteredTree. We do the  conversion here.
-        We receive a Liblarch path as argument and return a gtk.TreeIter"""
+        We receive a Liblarch path as argument and return a Gtk.TreeIter"""
         #The function is recursive. We take iter for path (A,B,C) in cache.
         #If there is not, we take iter for path (A,B) and try to find C.
         if path == ():
@@ -203,3 +206,5 @@ class TreeModel(gtk.TreeStore):
             it = None
         self.reorder(it, neworder)
         self.print_tree()
+
+# -----------------------------------------------------------------------------

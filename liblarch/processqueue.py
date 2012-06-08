@@ -18,15 +18,19 @@
 # -----------------------------------------------------------------------------
 
 import threading
-import gobject
+from gi.repository import GObject
 
-class SyncQueue:
-    """ Synchronized queue for processing requests"""
+class SyncQueue(object):
+    """
+    Synchronized queue for processing requests
+    """
 
     def __init__(self):
-        """ Initialize synchronized queue.
+        """
+        Initialize synchronized queue.
 
-        @param callback - function for processing requests"""
+        @param callback - function for processing requests
+        """
         self._low_queue = []
         self._queue = []
         self._vip_queue = []
@@ -37,7 +41,9 @@ class SyncQueue:
         self.count = 0
         
     def process_queue(self):
-        """ Process requests from queue """
+        """
+        Process requests from queue
+        """
         for action in self.process():
             func = action[0]
             func(*action[1:])
@@ -45,7 +51,8 @@ class SyncQueue:
         return True
         
     def push(self, *element, **kwargs):
-        """ Add a new element to the queue.
+        """
+        Add a new element to the queue.
 
         Process actions from the same thread as the thread which created
         this queue immediately. What does it mean? When I use liblarch
@@ -77,7 +84,7 @@ class SyncQueue:
         if element not in queue:
             queue.append(element)
             if self._handler is None:
-                self._handler = gobject.idle_add(self.process_queue)
+                self._handler = GObject.idle_add(self.process_queue)
 
         self._lock.release()
         
@@ -102,7 +109,9 @@ class SyncQueue:
         if len(self._queue) == 0 and len(self._vip_queue) == 0 and\
                                         len(self._low_queue) == 0 and\
                                         self._handler is not None:
-            gobject.source_remove(self._handler)
+            GObject.source_remove(self._handler)
             self._handler = None
         self._lock.release()
         return toreturn
+
+# -----------------------------------------------------------------------------

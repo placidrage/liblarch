@@ -226,28 +226,34 @@ class ViewTree:
         return key
 
     def deregister_cllbck(self, event, key):
-        """ Remove the callback identifed by key (from register_cllbck) """
+        """
+        Remove the callback identifed by key (from register_cllbck)
+        """
         try:
             del self.__cllbcks[event][key]
-        except KeyError:
-            pass
-        
+        except KeyError, exc:
+            print(str(exc))
+
     def __emit(self, event, node_id, path=None, neworder=None):
-        """ Handle a new event from MainTree or FilteredTree
-        by passing it to other objects, e.g. TreeWidget """
+        """
+        Handle a new event from MainTree or FilteredTree
+        by passing it to other objects, e.g. TreeWidget
+        """
         callbacks = dict(self.__cllbcks.get(event, {}))
-#        print "ViewTree __emit for %s" %str(node_id)
+        print("ViewTree __emit for {0}".format(str(node_id)))
         for func in callbacks.itervalues():
-#            print "   -> func = %s - %s" %(func,str(path))
+            print("   -> func = {0} - {1}".format(func, str(path)))
             if neworder:
                 func(node_id, path, neworder)
             else:
-                func(node_id,path)
+                func(node_id, path)
 
     def get_node(self, node_id):
-        """ Get a node from MainTree """
+        """
+        Get a node from MainTree
+        """
         return self.__maintree.get_node(node_id)
-        
+
     #FIXME Remove this method from public interface
     def get_root(self):
         return self.__maintree.get_root()
