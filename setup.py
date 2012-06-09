@@ -32,7 +32,7 @@ import liblarch
 # -----------------------------------------------------------------------------
 
 if sys.version_info < (2, 7):
-    print('ERROR: Gettextify requires at least Python 2.7 to run.')
+    print('ERROR: liblarch requires at least Python 2.7 to run.')
     sys.exit(1)
 
 # -----------------------------------------------------------------------------
