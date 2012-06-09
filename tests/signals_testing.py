@@ -18,9 +18,10 @@
 # -----------------------------------------------------------------------------
 
 import threading
-import gobject
 import time
 import unittest
+
+from gi.repository import GObject
 
 from tests.watchdog import Watchdog
 
@@ -28,7 +29,6 @@ class SignalCatcher(object):
     '''
     A class to test signals
     '''
-
 
     def __init__(self, unittest,  generator, signal_name,\
                  should_be_caught = True, how_many_signals = 1, \
@@ -134,8 +134,8 @@ class GobjectSignalsManager(object):
         This function returns only when the gobject main loop is running
         '''
         def gobject_main_loop():
-            gobject.threads_init()
-            self.main_loop = gobject.MainLoop()
+            GObject.threads_init()
+            self.main_loop = GObject.MainLoop()
             self.main_loop.run()
         threading.Thread(target = gobject_main_loop).start()
         while not hasattr(self, 'main_loop') or \
