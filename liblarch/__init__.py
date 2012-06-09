@@ -207,12 +207,16 @@ class ViewTree:
         self.__ft.set_callback('runonce',func,node_id=node_id,param=param)
         
     def get_basetree(self):
-        """ Return Tree object """
+        """
+        Return Tree object
+        """
         return self.maininterface
 
     def register_cllbck(self, event, func):
-        """ Store function and return unique key which can be used to
-        unregister the callback later """
+        """
+        Store function and return unique key which can be used to
+        unregister the callback later
+        """
 
         if not self.__cllbcks.has_key(event):
             self.__cllbcks[event] = {}
@@ -231,8 +235,9 @@ class ViewTree:
         """
         try:
             del self.__cllbcks[event][key]
-        except KeyError, exc:
-            print(str(exc))
+        except KeyError:
+            # callback non-existent
+            pass
 
     def __emit(self, event, node_id, path=None, neworder=None):
         """
@@ -263,10 +268,12 @@ class ViewTree:
         self.__maintree.refresh_all()
 
     def get_current_state(self):
-        """ Request current state to be send by signals/callbacks.
+        """
+        Request current state to be send by signals/callbacks.
 
         This allow LibLarch widget to connect on fly (e.g. after FilteredTree
-        is up and has some nodes). """
+        is up and has some nodes).
+        """
 
         if self.static:
             self.__maintree.refresh_all()
