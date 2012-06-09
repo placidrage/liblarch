@@ -51,19 +51,23 @@ class TreeNode(_Node):
         _Node.__init__(self,node_id,parent)
         
     def _set_tree(tree):
-        print "_set_tree is not part of the API"
+        print("_set_tree is not part of the API")
 
-class Tree:
-    """ A thin wrapper to MainTree that adds filtering capabilities.
+class Tree(object):
+    """
+    A thin wrapper to MainTree that adds filtering capabilities.
     It also provides a few methods to operate complex operation on the
-    MainTree (e.g, move_node) """ 
+    MainTree (e.g, move_node)
+    """
 
     def __init__(self):
         """ Creates MainTree which wraps and a main view without filters """
         self.__tree = MainTree()
         self.__fbank = FiltersBank(self.__tree)
         self.__views = {}
-        self.__views['main'] = ViewTree(self, self.__tree, self.__fbank, static=True)
+        self.__views['main'] = ViewTree(
+            self, self.__tree, self.__fbank, static=True
+        )
 
 ##### HANDLE NODES ############################################################
 
@@ -291,11 +295,15 @@ class ViewTree(object):
             self.__ft.get_current_state()
 
     def print_tree(self, string=None):
-        """ Print the shown tree, i.e. MainTree or FilteredTree """
+        """
+        Print the shown tree, i.e. MainTree or FilteredTree
+        """
         return self._tree.print_tree(string)
 
     def get_all_nodes(self):
-        """ Return list of node_id of displayed nodes """
+        """
+        Return list of node_id of displayed nodes
+        """
         return self._tree.get_all_nodes()
 
     def get_n_nodes(self, withfilters=[], include_transparent=True):
@@ -372,15 +380,21 @@ class ViewTree(object):
             if node and node.get_n_children() > n:
                 return node.get_nth_child(n)
             else:
-                raise ValueError("node %s has less than %s nodes" %(node_id, n))
+                raise ValueError(
+                    "node {0} has less than {1} nodes".format(node_id, n)
+                )
         else:
             realn = self.__ft.node_n_children(node_id)
             if realn <= n:
-                raise ValueError("viewtree has %s nodes, no node %s" %(realn, n))
+                raise ValueError(
+                    "viewtree has {0} nodes, no node {1}".format(realn, n)
+                )
             return self.__ft.node_nth_child(node_id, n)
         
     def node_has_parent(self, node_id):
-        """ Has node parents? Is it child of root? """
+        """
+        Has node parents? Is it child of root?
+        """
         return len(self.node_parents(node_id)) > 0
 
     def node_parents(self, node_id):

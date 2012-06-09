@@ -25,12 +25,13 @@ from gi.repository import GObject
 
 from tests.watchdog import Watchdog
 
-class SignalCatcher(object):
-    '''
-    A class to test signals
-    '''
 
-    def __init__(self, unittest,  generator, signal_name,\
+class SignalCatcher(object):
+    """
+    A class to test signals
+    """
+
+    def __init__(self, unittest, generator, signal_name,\
                  should_be_caught = True, how_many_signals = 1, \
                 error_code = "No error code set"):
         self.signal_catched_event = threading.Event()
@@ -49,7 +50,9 @@ class SignalCatcher(object):
             #then we notify the error
             #if the error_code is set to None, we're expecting it to fail.
             if error_code != None:
-                print "An expected signal wasn't received %s" % str(error_code)
+                print("An expected signal wasn't received {0!s}".format(
+                    error_code
+                ))
             self.unittest.assertFalse(should_be_caught)
 
         self.watchdog = Watchdog(3, _on_failure)
@@ -74,9 +77,9 @@ class SignalCatcher(object):
                 self.watchdog.__exit__(err_type, value, traceback)
 
 class CallbackCatcher(object):
-    '''
+    """
     A class to test callbacks
-    '''
+    """
 
 
     def __init__(self, unittest,  generator, signal_name,\
@@ -98,7 +101,9 @@ class CallbackCatcher(object):
             #then we notify the error
             #if the error_code is set to None, we're expecting it to fail.
             if error_code != None:
-                print "An expected signal wasn't received %s" % str(error_code)
+                print("An expected signal wasn't received {0!s}".format(
+                    error_code
+                ))
             self.unittest.assertFalse(should_be_caught)
 
         self.watchdog = Watchdog(3, _on_failure)
@@ -106,14 +111,18 @@ class CallbackCatcher(object):
     def __enter__(self):
 
         def __signal_callback(*args):
-            """ Difference to SignalCatcher is that we do not skip
+            """
+            Difference to SignalCatcher is that we do not skip
             the first argument. The first argument by signals is widget
-            which sends the signal -- we omit this feature when using callbacks """
+            which sends the signal -- we omit this feature when using callbacks
+            """
             self.signal_arguments.append(args)
             if len(self.signal_arguments) >= self.how_many_signals:
                 self.signal_catched_event.set()
 
-        self.handler = self.generator.register_cllbck(self.signal_name, __signal_callback)
+        self.handler = self.generator.register_cllbck(
+            self.signal_name, __signal_callback
+        )
         self.watchdog.__enter__()
         return [self.signal_catched_event, self.signal_arguments]
 
@@ -123,16 +132,13 @@ class CallbackCatcher(object):
             self.assertFalse(True)
         return not isinstance(value, Exception) and \
                 self.watchdog.__exit__(err_type, value, traceback)
-    
 
 class GobjectSignalsManager(object):
-    
-
     def init_signals(self):
-        '''
+        """
         Initializes the gobject main loop so that signals can be used.
         This function returns only when the gobject main loop is running
-        '''
+        """
         def gobject_main_loop():
             GObject.threads_init()
             self.main_loop = GObject.MainLoop()
@@ -148,3 +154,4 @@ class GobjectSignalsManager(object):
 #        if has_attr(self,'main_loop'):
         self.main_loop.quit()
 
+# -----------------------------------------------------------------------------
