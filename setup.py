@@ -18,25 +18,44 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-from setuptools import setup
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    import distribute_setup
+    distribute_setup.use_setuptools()
+    from setuptools import setup, find_packages
 
-VERSION = '0.2.1'
+import sys
+import liblarch
+
+
+# -----------------------------------------------------------------------------
+
+if sys.version_info < (2, 7):
+    print('ERROR: Gettextify requires at least Python 2.7 to run.')
+    sys.exit(1)
+
+# -----------------------------------------------------------------------------
 
 params = {}
 params['liblarch'] = {
-    'description': 'Liblarch is a python library built to easily handle ' \
-        'data structure such are lists, trees and acyclic graphs (tree where ' \
-        'nodes can have multiple parents)',
+    'description': (
+        'Liblarch is a python library built to easily handle '
+        'data structure such are lists, trees and acyclic graphs (tree where '
+        'nodes can have multiple parents)'),
 }
+
 params['liblarch_gtk'] = {
     'description': 'GTK binding for Liblarch.',
 }
 
-standalone_packages = ['liblarch', 'liblarch_gtk']
+# -----------------------------------------------------------------------------
+
+standalone_packages = find_packages(exclude=['tests'])
 
 for package in standalone_packages:
     setup(
-      version = VERSION,
+      version = liblarch.__version__,
       url = 'https://live.gnome.org/liblarch',
       author = 'Lionel Dricot & Izidor Matušov',
       author_email = 'gtg-contributors@lists.launchpad.net',
@@ -46,3 +65,5 @@ for package in standalone_packages:
       packages = [package],
       **params[package]
     )
+
+# -----------------------------------------------------------------------------

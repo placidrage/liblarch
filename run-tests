@@ -18,7 +18,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-"""Runs the GTG unit tests."""
+"""
+Runs the GTG unit tests.
+"""
 
 import sys
 import unittest

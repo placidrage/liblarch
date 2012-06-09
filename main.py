@@ -71,14 +71,14 @@ def save_backup(fun):
         sys.stdout = output
         sys.stderr = output
 
-        print "Tree before operation"
+        print("Tree before operation")
         self.print_tree()
         print
-        print "Operation '%s':" % (fun.__name__)
+        print("Operation '{0}':".format(fun.__name__))
 
         res = fun(*args, **kwargs)
 
-        print "Tree after operation"
+        print("Tree after operation")
         self.print_tree()
 
         sys.stdout = stdout
@@ -88,7 +88,7 @@ def save_backup(fun):
 
         # Print the log
         output = open(file_name, "r")
-        print output.read()
+        print(output.read())
         output.close()
 
         return res
@@ -138,15 +138,17 @@ class Backend(threading.Thread):
             # Delete some tasks
             for i in range(randint(3,10)):
                 delete_id = str(choice([1,3,5]))+"sec_"+str(randint(0, 2*counter))
-                print self.backend_id + " deleting " + delete_id
+                print("{0} deleting {1}".format(self.backend_id, delete_id))
                 self.tree.del_node(delete_id)
             counter += 1
 
-        print self.backend_id + " --- finish"
+        print("{0} --- finish".format(self.backend_id))
 
-class LiblarchDemo:
-    """ Shows a simple GUI demo of liblarch usage
-    with several functions for adding tasks """
+class LiblarchDemo(object):
+    """
+    Shows a simple GUI demo of liblarch usage
+    with several functions for adding tasks.
+    """
 
     def _build_tree_view(self):
         self.tree = Tree()
@@ -177,7 +179,11 @@ class LiblarchDemo:
 
         # Polish TreeView
         def on_row_activate(sender,a,b):
-            print "Selected nodes are: %s" %str(tree_view.get_selected_nodes())
+            print(
+                "Selected nodes are: {0!s}".format(
+                    tree_view.get_selected_nodes()
+                )
+            )
 
         tree_view.set_dnd_name('liblarch-demo/liblarch_widget')
         tree_view.set_multiple_selection(True)
@@ -186,36 +192,43 @@ class LiblarchDemo:
         tree_view.connect('row-activated', on_row_activate)
 
         return tree_view
-        
+
     def even_filter(self,node):
         if node.get_id().isdigit():
             return int(node.get_id())%2 == 0
         else:
             return False
-    
-    def odd_filter(self,node):
+
+    def odd_filter(self, node):
         return not self.even_filter(node)
-        
-    def flat_filter(self,node,parameters=None):
+
+    def flat_filter(self, node, parameters=None):
         return True
-        
-    def leaf_filter(self,node):
+
+    def leaf_filter(self, node):
         return not node.has_child()
-        
-    def _modified_count(self,nid,path):
-#        print "Node %s has been modified" %nid
+
+    def _modified_count(self, nid, path):
+#        print("Node {0} has been modified".format(nid))
         self.mod_counter += 1
-        
+
     def _update_title(self,sender,nid):
         count = self.view_tree.get_n_nodes()
         if count == LOAD_MANY_TASKS_COUNT and self.start_time > 0:
             stop_time = time() - self.start_time
-            print "Time to load %s tasks: %s" %(LOAD_MANY_TASKS_COUNT,stop_time)
+            print(
+                "Time to load {0} tasks: {1}".format(
+                    LOAD_MANY_TASKS_COUNT,stop_time
+                )
+            )
 #        if count > 0:
             mean = self.mod_counter * 1.0 / count
-            print "%s modified signals were received (%s per task)" %(self.mod_counter, mean)     
+            print(
+                "{0} modified signals were received ({1} per task)".format(
+                    self.mod_counter, mean
+                )
+            )
         self.window.set_title('Liblarch demo: %s nodes' %count)
-        
 
     def __init__(self):
         self.window = Gtk.Window()
@@ -228,7 +241,7 @@ class LiblarchDemo:
         self.liblarch_widget = self._build_tree_view()
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.add_with_viewport(self.liblarch_widget)
-        
+
         self.start_time = 0
 
         # Buttons
@@ -317,21 +330,23 @@ class LiblarchDemo:
         return newlabel
 
     def print_tree(self, widget=None):
-        print 
-        print "=" * 20, "Tree", "=" * 20
+        print
+        print("{0} Tree {0}".format("=" * 20))
         self.tree.get_main_view().print_tree()
-        print "=" * 46
+        print("=" * 46)
         print
 
     def print_ft(self, widget=None):
-        print 
+        print
         self.view_tree.print_tree()
         print
     
     @save_backup
     def add_task(self, widget):
-        """ Add a new task. If a task is selected,
-        the new task is added as its child """
+        """
+        Add a new task. If a task is selected,
+        the new task is added as its child
+        """
         selected = self.liblarch_widget.get_selected_nodes()
 
         t_id = random_id()
@@ -342,16 +357,20 @@ class LiblarchDemo:
             # Adding a subchild
             parent = selected[0]
             self.tree.add_node(task, parent_id = parent)
-            print 'Added sub-task "%s" (%s) for %s' % (t_title, t_id, parent)
+            print(
+                'Added sub-task "{0}" ({1}) for {2}'.format(
+                    t_title, t_id, parent
+                )
+            )
         else:
             # Adding as a new child
             self.tree.add_node(task)
             for parent_id in selected:
                 task.add_parent(parent_id)
-            print 'Added task "%s" (%s)' % (t_title, t_id)
+            print('Added task "{0}" ({1})'.format(t_title, t_id))
             
     def apply_filter(self,widget,param):
-        print "applying filter: %s" %param
+        print("applying filter: {0}".format(param))
         if param in self.view_tree.list_applied_filters():
             self.view_tree.unapply_filter(param)
         else:
@@ -359,9 +378,11 @@ class LiblarchDemo:
 
     @save_backup
     def tree_high_3(self, widget):
-        ''' We add the leaf nodes before the root, in order to test
-        if it works fine even in this configuration'''
-        print 'Adding a tree of height 3'
+        """
+        We add the leaf nodes before the root, in order to test
+        if it works fine even in this configuration
+        """
+        print('Adding a tree of height 3')
 
         selected = self.liblarch_widget.get_selected_nodes()
 
@@ -389,7 +410,7 @@ class LiblarchDemo:
 
     @save_backup
     def tree_high_3_backwards(self, widget):
-        print 'Adding a tree of height 3 backwards'
+        print('Adding a tree of height 3 backwards')
 
         selected = self.liblarch_widget.get_selected_nodes()
 
@@ -416,30 +437,30 @@ class LiblarchDemo:
         relationships = reversed(relationships)
 
         for t_id, task in tasks:
-            print "Adding task to tree:", t_id, task
+            print("Adding task to tree: {0} {1}".format(t_id, task))
             self.tree.add_node(task)
-            print "="*50
+            print("="*50)
 
         for parent, child in relationships:
-            print "New relationship: ", parent, "with", child
+            print("New relationship: {0} with {1}".format(parent, child))
             parent_node = self.tree.get_node(parent)
             parent_node.add_child(child)
-            print "="*50
+            print("="*50)
 
         print
 
     @save_backup
-    def delete_task(self, widget, order='normal'):
-        print 'Deleting a task'
+    def delete_task(self, widget, order="normal"):
+        print("Deleting a task")
         selected = self.liblarch_widget.get_selected_nodes()
 
-        print 'Order: %s' % order
+        print("Order: {0}".format(order))
 
-        if   order == 'normal':
+        if   order == "normal":
             ordered_nodes = selected
-        elif order == 'backward':
+        elif order == "backward":
             ordered_nodes = reversed(selected)
-        elif order == 'random':
+        elif order == "random":
             ordered_nodes = selected
             shuffle(ordered_nodes)
             # Replace iterator for a list => 
@@ -452,20 +473,26 @@ class LiblarchDemo:
             Log.error('Unknown order, skipping...')
             return
 
-        print "Tasks should be removed in this order:", ordered_nodes
+        print(
+            "Tasks should be removed in this order: {0}".format(ordered_nodes)
+        )
 
         for node_id in ordered_nodes:
             self.tree.del_node(node_id)
-            print 'Removed node %s' % node_id
+            print("Removed node {0}".format(node_id))
 
         self.print_tree(None)
 
     def delete_backwards(self, widget):
-        """ Delete task backward """
+        """
+        Delete task backward
+        """
         self.delete_task(widget, order='backward')
 
     def delete_random(self, widget):
-        """ Delete tasks in random order """
+        """
+        Delete tasks in random order
+        """
         self.delete_task(widget, order='random')
 
     def delete_magic(self, widget):
@@ -479,7 +506,7 @@ class LiblarchDemo:
             node.modified()
 
     def backends(self, widget):
-        print "Backends...."
+        print("Backends....")
         Backend('1sec', self.should_finish, 1, self.tree).start()
         Backend('3sec', self.should_finish, 3, self.tree).start()
         Backend('5sec', self.should_finish, 5, self.tree).start()
@@ -508,7 +535,7 @@ class LiblarchDemo:
                 # Sleep 0.01 second to create illusion of real tasks
                 sleep(SLEEP_BETWEEN_TASKS)
 
-            print "end of _many_tasks thread"
+            print("end of _many_tasks thread")
         t = threading.Thread(target=_many_tasks)
         t.start()
 
@@ -530,10 +557,16 @@ class LiblarchDemo:
 
         log = open(file_name, 'r').read()
 
-        m = re.match('\s*Tree before operation\s+=+\s+Tree\s+=+\s+(.*?)=+', log, re.UNICODE | re.DOTALL)
+        m = re.match(
+            '\s*Tree before operation\s+=+\s+Tree\s+=+\s+(.*?)=+',
+            log, re.UNICODE | re.DOTALL
+        )
         if m:
             treelines = m.group(1)
-            items = [(len(line) - len(line.lstrip()), line.strip()) for line in treelines.splitlines()]
+            items = [
+                (len(line) - len(line.lstrip()), line.strip())
+                for line in treelines.splitlines()
+            ]
             # Filter "root" item and decrease level
             items = [(level, name) for level, name in items[1:]]
 
@@ -556,20 +589,28 @@ class LiblarchDemo:
 
                 parent_level[level] = name
 
-            print "Nodes to add:", nodes
-            print "Relationships:", "\n".join(str(r) for r in relationships)
+            print("Nodes to add: {0}".format(nodes))
+            print(
+                "Relationships: {0}".format(
+                    "\n".join(str(r) for r in relationships)
+                )
+            )
             print
 
             for node_id in nodes:
-                task = TaskNode(node_id, random_task_title(node_id),self.view_tree)
+                task = TaskNode(
+                    node_id,
+                    random_task_title(node_id),
+                    self.view_tree
+                )
                 self.tree.add_node(task)
 
             for parent, child in relationships:
                 parent_node = self.tree.get_node(parent)
                 parent_node.add_child(child)
         else:
-            print "Not matched"
-            print "Log: ", log
+            print("Not matched")
+            print("Log: {0}".format(log))
 
     def finish(self, widget):
         self.should_finish.set()

@@ -24,6 +24,13 @@ from liblarch.treenode import _Node
 from liblarch.filteredtree import FilteredTree
 from liblarch.filters_bank import FiltersBank
 
+
+# -----------------------------------------------------------------------------
+
+__version__ = '0.2.1'
+
+# -----------------------------------------------------------------------------
+
 #API version of liblarch. 
 #Your application is compatible if the major version number match liblarch's one
 #and if your minor version number is inferior to liblarch's one.
@@ -36,7 +43,7 @@ def is_compatible(request):
     major,minor=request.split(".")
     current_ma,current_mi=api.split(".")
     return (major == current_ma and minor <= current_mi)
-    
+
 class TreeNode(_Node):
     """ The public interface for TreeNode
     """
@@ -154,12 +161,15 @@ class Tree:
         """
         return self.__fbank.remove_filter(filter_name)
 
+# -----------------------------------------------------------------------------
+
 # There should be two classes: for static and for dynamic mode
 # There are many conditions, and also we would prevent unallowed modes
-class ViewTree:
-    def __init__(self, maininterface, maintree, filters_bank,\
-                                name = None,
-                                             refresh = True, static = False):
+class ViewTree(object):
+    def __init__(
+        self,
+        maininterface, maintree, filters_bank,
+        name = None, refresh = True, static = False):
         """A ViewTree is the interface that should be used to display Tree(s).
 
            In static mode, FilteredTree layer is not created. (There is no need)
@@ -168,12 +178,12 @@ class ViewTree:
            If FilteredTree is used, it is connected to MainTree to handle changes
            and then send id to ViewTree if it applies.
 
-           @param maintree: a Tree object, cointaining all the nodes
-           @param filters_bank: a FiltersBank object. Filters can be added
+           :param maintree: a Tree object, cointaining all the nodes
+           :param filters_bank: a FiltersBank object. Filters can be added
                                 dinamically to that.
-           @param refresh: if True, this ViewTree is automatically refreshed
+           :param refresh: if True, this ViewTree is automatically refreshed
                            after applying a filter.
-           @param static: if True, this is the view of the complete maintree.
+           :param static: if True, this is the view of the complete maintree.
                            Filters cannot be added to such a view.
         """
         self.maininterface = maininterface
@@ -429,3 +439,5 @@ class ViewTree:
                             "on a static tree\n")
         else:
              self.__ft.reset_filters(refresh, transparent_only)
+
+# -----------------------------------------------------------------------------

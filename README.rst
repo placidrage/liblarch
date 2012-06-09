@@ -25,8 +25,8 @@ Liblarch is released under the **LGPLv3** license.
 
 .. rubric:: Authors:
 
-| Lionel Dricot <ploum@ploum.net>
-| Izidor Matušov <izidor.matusov@gmail.com>
+| Lionel Dricot <ploum@ploum.net>.
+| Izidor Matušov <izidor.matusov@gmail.com>.
 
 
 .. rubric:: Footnotes:

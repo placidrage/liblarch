@@ -59,19 +59,21 @@ class DummyNode(TreeNode):
 
 
 class TestLibLarch(unittest.TestCase):
-    """Tests for `Tree`."""
+    """
+    Tests for `Tree`.
+    """
 
 
     def caller_name(self):
-        '''
+        """
         Returns the filename and the line of the calling function.
         Precisely, it returns the calling calling function (because
         you're calling this one).
-        '''
+        """
         frame=inspect.currentframe()
         frame=frame.f_back.f_back
         code=frame.f_code
-        return code.co_filename, code.co_firstlineno    
+        return code.co_filename, code.co_firstlineno
 
     def _assertSignal(self, generator, signal_name, function, \
                      how_many_signals = 1):
@@ -110,7 +112,8 @@ class TestLibLarch(unittest.TestCase):
         assertSignal = _assertSignal
 
     def test_assertSignal(self):
-        """ Creates a fake GObject which emits N signals and test whether
+        """
+        Creates a fake GObject which emits N signals and test whether
         they are emitted.
 
         The last parameter of assertSignal(...)(33) is parameter for
@@ -118,19 +121,24 @@ class TestLibLarch(unittest.TestCase):
         """
 
         class FakeGobject(GObject.GObject):
-            __gsignals__ = {'node-added-inview': (GObject.SignalFlags.RUN_FIRST,
-                                    None, [])}
+            __gsignals__ = {
+                'node-added-inview': (GObject.SignalFlags.RUN_FIRST, None, [])
+            }
+
             def emit_n_signals(self, n):
                 while n:
                     n -= 1
                     GObject.idle_add(self.emit, 'node-added-inview')
         fake_gobject = FakeGobject()
-        self._assertSignal(fake_gobject, \
-                          'node-added-inview', \
-                          fake_gobject.emit_n_signals, 33)(33)
+        self._assertSignal(
+            fake_gobject,
+            'node-added-inview',
+            fake_gobject.emit_n_signals, 33
+        )(33)
 
     def setUp(self):
-        """Set up a dummy tree with filters and nodes.
+        """
+        Set up a dummy tree with filters and nodes.
 
         Construct a Tree for testing, with some filters for testing, including
         filters with parameters 'flat' and 'transparent'.  Create a collection of
@@ -146,18 +154,18 @@ class TestLibLarch(unittest.TestCase):
         self.view = self.tree.get_viewtree()
         self.tester = TreeTester(self.view)
         self.mainview = self.tree.get_main_view()
-        self.tree.add_filter('blue',self.is_blue)
-        self.tree.add_filter('green',self.is_green)
-        self.tree.add_filter('red',self.is_red)
-        self.tree.add_filter('leaf',self.is_leaf)
+        self.tree.add_filter('blue', self.is_blue)
+        self.tree.add_filter('green', self.is_green)
+        self.tree.add_filter('red', self.is_red)
+        self.tree.add_filter('leaf', self.is_leaf)
         param = {}
         param['flat'] = True
-        self.tree.add_filter('flatgreen',self.is_green,parameters=param)
-        self.tree.add_filter('flatleaves',self.is_leaf,parameters=param)
+        self.tree.add_filter('flatgreen', self.is_green,parameters=param)
+        self.tree.add_filter('flatleaves', self.is_leaf,parameters=param)
         param = {}
         param['transparent'] = True
-        self.tree.add_filter('transblue',self.is_blue,parameters=param)
-        self.tree.add_filter('transgreen',self.is_green,parameters=param)
+        self.tree.add_filter('transblue', self.is_blue,parameters=param)
+        self.tree.add_filter('transgreen', self.is_green,parameters=param)
         #first, we add some red nodes at the root
         while i < 5:
             node = DummyNode(str(i))
@@ -177,7 +185,7 @@ class TestLibLarch(unittest.TestCase):
         while i < 15:
             node = DummyNode(str(i))
             node.add_color('green')
-            self.tree.add_node(node,parent_id=str(i-1))
+            self.tree.add_node(node, parent_id=str(i-1))
             i+=1
             self.green_nodes += 1
         self.total = self.red_nodes + self.blue_nodes + self.green_nodes
@@ -187,24 +195,35 @@ class TestLibLarch(unittest.TestCase):
         col = {}
         col['title'] = "Node name"
         render_text = Gtk.CellRendererText()
-        col['renderer'] = ['markup',render_text]
+        col['renderer'] = ['markup', render_text]
         def get_node_name(node):
             return node.get_id()
-        col['value'] = [str,get_node_name]
+        col['value'] = [str, get_node_name]
         desc['titles'] = col
         treeview = TreeView(self.view,desc)
         #initalize gobject signaling system
         self.gobject_signal_manager = GobjectSignalsManager()
         self.gobject_signal_manager.init_signals()
-        self.recorded_signals = {'node-added-inview': [],
-                                 'node-modified-inview': [],
-                                 'node-deleted-inview': []}
-        self.assertNodeAddedInview = functools.partial ( \
-            self.assertSignal, self.view, 'node-added-inview')
-        self.assertNodeModifiedInview = functools.partial ( \
-            self.assertSignal, self.view, 'node-modified-inview')
-        self.assertNodeDeletedInview = functools.partial ( \
-            self.assertSignal, self.view, 'node-deleted-inview')
+        self.recorded_signals = {
+            'node-added-inview': [],
+            'node-modified-inview': [],
+            'node-deleted-inview': [],
+        }
+        self.assertNodeAddedInview = functools.partial(
+            self.assertSignal,
+            self.view,
+            'node-added-inview'
+        )
+        self.assertNodeModifiedInview = functools.partial(
+            self.assertSignal,
+            self.view,
+            'node-modified-inview'
+        )
+        self.assertNodeDeletedInview = functools.partial(
+            self.assertSignal,
+            self.view,
+            'node-deleted-inview'
+        )
 
     def tearDown(self):
         try:
@@ -237,7 +256,7 @@ class TestLibLarch(unittest.TestCase):
         self.assertTrue(node != None)
         self.assertEqual(str(self.total-1),node.get_id())
         #and not for an non-existing node
-        self.assertRaises(ValueError,self.tree.get_node,str(self.total))
+        self.assertRaises(ValueError, self.tree.get_node, str(self.total))
 
     def test_add_remove_node(self):
         """ Test the adding and removal of nodes """
@@ -247,33 +266,39 @@ class TestLibLarch(unittest.TestCase):
 
         # run "self.tree.add_node(node, parent_id = '0')" and check that 
         # it generates a 'node-added-view' AND a 'node-modified-inview'
-        self.assertSignal(self.view, \
-                            'node-modified-inview', \
-                            self.assertSignal(self.view, \
-                                              'node-added-inview', \
-                                          self.tree.add_node))(node, parent_id = '0')
+        self.assertSignal(
+            self.view,
+            'node-modified-inview',
+            self.assertSignal(
+                self.view,
+                'node-added-inview',
+                self.tree.add_node
+            )
+        )(node, parent_id = '0')
         self.assertTrue(('temp',('0', 'temp')) in self.recorded_signals['node-added-inview'])
         self.assertTrue(('0',('0', )) in \
                      self.recorded_signals['node-modified-inview'])
         shouldbe = self.blue_nodes + 1
         total = self.red_nodes + self.blue_nodes + self.green_nodes
         #Testing that the blue node count has increased
-        self.assertEqual(total+1,view.get_n_nodes())
-        self.assertEqual(shouldbe,view.get_n_nodes(withfilters=['blue']))
+        self.assertEqual(total+1, view.get_n_nodes())
+        self.assertEqual(shouldbe, view.get_n_nodes(withfilters=['blue']))
         #also comparing with another view
-        self.assertEqual(total+1,self.view.get_n_nodes())
+        self.assertEqual(total+1, self.view.get_n_nodes())
         self.assertEqual(shouldbe,self.view.get_n_nodes(withfilters=['blue']))
         self.tree.del_node('temp')
         #Testing that it goes back to normal
         self.assertEqual(total,view.get_n_nodes())
-        self.assertEqual(self.blue_nodes,view.get_n_nodes(withfilters=['blue']))
+        self.assertEqual(self.blue_nodes, view.get_n_nodes(withfilters=['blue']))
         #also comparing with another view
         self.assertEqual(total,self.view.get_n_nodes())
-        self.assertEqual(self.blue_nodes,self.view.get_n_nodes(withfilters=['blue']))
+        self.assertEqual(self.blue_nodes, self.view.get_n_nodes(withfilters=['blue']))
         self.tester.test_validity()
         
     def test_modifying_node(self):
-        """ Modifying a node and see if the change is reflected in filters """
+        """
+        Modifying a node and see if the change is reflected in filters
+        """
         viewblue = self.tree.get_viewtree(refresh=False)
         testblue = TreeTester(viewblue)
         viewblue.apply_filter('blue')
@@ -283,9 +308,12 @@ class TestLibLarch(unittest.TestCase):
         node = DummyNode('temp')
         node.add_color('blue')
         #Do you see : we are modifying a child
-        self.assertSignal(self.view, \
-                          'node-modified-inview', \
-                          self.tree.add_node, 1)(node,parent_id='0')
+        self.assertSignal(
+            self.view,
+            'node-modified-inview',
+            self.tree.add_node,
+            1
+        )(node,parent_id='0')
         self.assertTrue(('0',('0', )) in self.recorded_signals['node-modified-inview'])
         #Node is blue
         self.assertTrue(viewblue.is_displayed('temp'))
@@ -302,7 +330,8 @@ class TestLibLarch(unittest.TestCase):
         testblue.test_validity()
 
     def test_removing_parent(self):
-        """Test behavior of node when its parent goes away.
+        """
+        Test behavior of node when its parent goes away.
 
         When you remove a parent, the child nodes should be added to
         the root if they don't have any other parents.
@@ -323,15 +352,17 @@ class TestLibLarch(unittest.TestCase):
         self.assertTrue('temp' in all_nodes)
         
     def test_adding_to_late_parent(self):
-        '''Add a node to a parent not yet in the tree
-        then add the parent later'''
+        """
+        Add a node to a parent not yet in the tree
+        then add the parent later
+        """
         view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('child')
         self.tree.add_node(node,parent_id='futur')
         all_nodes = view.get_all_nodes()
         self.assertTrue('child' in all_nodes)
         self.assertFalse('futur' in all_nodes)
-        self.assertEqual(len(view.node_parents('child')),0)
+        self.assertEqual(len(view.node_parents('child')), 0)
         #now inserting the parent
         node2 = DummyNode('futur')
         self.tree.add_node(node2)
@@ -347,18 +378,20 @@ class TestLibLarch(unittest.TestCase):
         view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('child')
         self.tree.add_node(node)
-        self.assertEqual(len(view.node_parents('child')),0)
+        self.assertEqual(len(view.node_parents('child')), 0)
         node2 = DummyNode('futur')
         node.add_parent('futur')
         node.modified()
-        self.assertEqual(len(view.node_parents('child')),0)
-        self.assertNotEqual(view.get_paths_for_node('child'),[(0,0)])
+        self.assertEqual(len(view.node_parents('child')), 0)
+        self.assertNotEqual(view.get_paths_for_node('child'), [(0, 0)])
         self.tree.add_node(node2)
         self.assertTrue('futur' in view.node_parents('child'))
         
     def test_adding_to_late_parent3(self):
-        '''Another tricky case with late parent. This was
-        a very rare but existing crash'''
+        """
+        Another tricky case with late parent. This was
+        a very rare but existing crash
+        """
         view = self.tree.get_viewtree(refresh=True)
         view.apply_filter('red')
         node = DummyNode('child')
@@ -368,36 +401,39 @@ class TestLibLarch(unittest.TestCase):
         node2.remove_color('red')
         node.add_parent('0')
         node.modified()
-        self.assertEqual(len(view.node_parents('child')),0)
-        self.assertNotEqual(view.get_paths_for_node('child'),[('0','child')])
+        self.assertEqual(len(view.node_parents('child')), 0)
+        self.assertNotEqual(view.get_paths_for_node('child'), [('0', 'child')])
         node2.add_color('red')
         self.assertTrue('0' in view.node_parents('child'))
         
     def test_adding_self_parent(self):
-        '''A node cannot be its own parent'''
+        """
+        A node cannot be its own parent
+        """
         view = self.tree.get_viewtree(refresh=True)
         node = view.get_node('0')
         node.add_parent('0')
-        self.assertEqual(len(node.get_parents()),0)
-        self.assertEqual(len(node.get_children()),0)
+        self.assertEqual(len(node.get_parents()), 0)
+        self.assertEqual(len(node.get_children()), 0)
         node.set_parent('0')
-        self.assertEqual(len(node.get_parents()),0)
-        self.assertEqual(len(node.get_children()),0)
+        self.assertEqual(len(node.get_parents()), 0)
+        self.assertEqual(len(node.get_children()), 0)
         node.add_child('0')
-        self.assertEqual(len(node.get_parents()),0)
-        self.assertEqual(len(node.get_children()),0)
-        
-        
+        self.assertEqual(len(node.get_parents()), 0)
+        self.assertEqual(len(node.get_children()), 0)
+
     def test_multiple_children(self):
-        '''We test a node with two children.'''
+        """
+        We test a node with two children.
+        """
         view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('child')
         node2 = DummyNode('child2')
-        self.tree.add_node(node,parent_id='0')
-        self.tree.add_node(node2,parent_id='0')
+        self.tree.add_node(node, parent_id='0')
+        self.tree.add_node(node2, parent_id='0')
         #We first test that the childrens are both there.
-        self.assertEqual(view.node_n_children('0'),2)
-        self.assertEqual(view.next_node('child'),'child2')
+        self.assertEqual(view.node_n_children('0'), 2)
+        self.assertEqual(view.next_node('child'), 'child2')
         #We build a list of children paths
         paths = []
         paths += view.get_paths_for_node('child')
@@ -412,49 +448,48 @@ class TestLibLarch(unittest.TestCase):
             self.assertTrue(p in paths)
             
     def test_counting_children(self):
-        '''We test the number of children, recursively or not'''
+        """We test the number of children, recursively or not"""
         view = self.tree.get_viewtree(refresh=True)
         zero = self.tree.get_node('0')
         zero.add_color('blue')
         node = DummyNode('child')
         node.add_color('blue')
         node2 = DummyNode('child2')
-        self.assertEqual(view.node_n_children('0'),0)
+        self.assertEqual(view.node_n_children('0'), 0)
         self.tree.add_node(node,parent_id='0')
-        self.assertEqual(view.node_n_children('0'),1)
+        self.assertEqual(view.node_n_children('0'), 1)
         self.tree.add_node(node2,parent_id='0')
-        self.assertEqual(view.node_n_children('0'),2)
-        self.assertEqual(view.node_n_children('0',recursive=True),2)
+        self.assertEqual(view.node_n_children('0'), 2)
+        self.assertEqual(view.node_n_children('0',recursive=True), 2)
         node3 = DummyNode('child3')
         node3.add_color('blue')
         self.tree.add_node(node3,parent_id='child')
-        self.assertEqual(view.node_n_children('0'),2)
-        self.assertEqual(view.node_n_children('0',recursive=True),3)
+        self.assertEqual(view.node_n_children('0'), 2)
+        self.assertEqual(view.node_n_children('0',recursive=True), 3)
         node4 = DummyNode('child4')
         self.tree.add_node(node4,parent_id='child3')
-        self.assertEqual(view.node_n_children('0'),2)
-        self.assertEqual(view.node_n_children('0',recursive=True),4)
-        self.assertEqual(view.node_n_children('child'),1)
-        self.assertEqual(view.node_n_children('child',recursive=True),2)
+        self.assertEqual(view.node_n_children('0'), 2)
+        self.assertEqual(view.node_n_children('0',recursive=True), 4)
+        self.assertEqual(view.node_n_children('child'), 1)
+        self.assertEqual(view.node_n_children('child',recursive=True), 2)
         view.apply_filter('blue')
-        self.assertEqual(view.node_n_children('0'),1)
-        self.assertEqual(view.node_n_children('0',recursive=True),2)
-        self.assertEqual(view.node_n_children('child'),1)
-        self.assertEqual(view.node_n_children('child',recursive=True),1)
+        self.assertEqual(view.node_n_children('0'), 1)
+        self.assertEqual(view.node_n_children('0',recursive=True), 2)
+        self.assertEqual(view.node_n_children('child'), 1)
+        self.assertEqual(view.node_n_children('child',recursive=True), 1)
         node5 = DummyNode('child5')
         self.tree.add_node(node5,parent_id='child2')
         self.tree.del_node('child4')
-        self.assertEqual(view.node_n_children('0'),1)
+        self.assertEqual(view.node_n_children('0'), 1)
         node2.add_color('blue')
-        self.assertEqual(view.node_n_children('0',recursive=True),3)
+        self.assertEqual(view.node_n_children('0',recursive=True), 3)
         view.unapply_filter('blue')
-        self.assertEqual(view.node_n_children('0'),2)
-        self.assertEqual(view.node_n_children('0',recursive=True),4)
+        self.assertEqual(view.node_n_children('0'), 2)
+        self.assertEqual(view.node_n_children('0',recursive=True), 4)
         self.tree.del_node('child3')
-        self.assertEqual(view.node_n_children('0'),2)
-        self.assertEqual(view.node_n_children('0',recursive=True),3)
-        
-            
+        self.assertEqual(view.node_n_children('0'), 2)
+        self.assertEqual(view.node_n_children('0',recursive=True), 3)
+
     def test_clean_multiple_parents(self):
         view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('child')
@@ -463,19 +498,20 @@ class TestLibLarch(unittest.TestCase):
         self.tree.add_node(node2,parent_id='child')
         node.add_parent('1')
         node2.add_parent('1')
-        self.assertEqual(len(view.node_parents('child')),2)
+        self.assertEqual(len(view.node_parents('child')), 2)
         view.apply_filter('blue')
 
     def test_adding_to_late_parent_with_leaf_filter(self):
-        '''Add a node to a parent not yet in the tree
-        then add the parent later'''
+        """Add a node to a parent not yet in the tree
+        then add the parent later
+        """
         view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('child')
         self.tree.add_node(node,parent_id='futur')
         all_nodes = view.get_all_nodes()
         self.assertTrue('child' in all_nodes)
         self.assertFalse('futur' in all_nodes)
-        self.assertEqual(len(view.node_parents('child')),0)
+        self.assertEqual(len(view.node_parents('child')), 0)
         #now inserting the parent
         view.apply_filter('leaf')
         node2 = DummyNode('futur')
@@ -494,23 +530,23 @@ class TestLibLarch(unittest.TestCase):
         self.tree.add_node(node,parent_id='0')
         view = self.tree.get_viewtree(refresh=False)
         view.apply_filter('red')
-        self.assertEqual(view.node_parents('child'),['0'])
+        self.assertEqual(view.node_parents('child'), ['0'])
         path0 = view.get_paths_for_node('0')[0]
         pathchild = path0 + ('child',)
-        self.assertEqual(view.get_paths_for_node('child'),[pathchild])
+        self.assertEqual(view.get_paths_for_node('child'), [pathchild])
         node0 = view.get_node('0')
         node0.add_color('blue')
-        self.assertEqual(view.node_parents('child'),['0'])
+        self.assertEqual(view.node_parents('child'), ['0'])
         self.assertEqual(view.get_paths_for_node('child'),[pathchild])
         node0.remove_color('red')
-        self.assertEqual(view.node_parents('child'),[])
-        self.assertEqual(view.get_paths_for_node('child'),[('child',)])
+        self.assertEqual(view.node_parents('child'), [])
+        self.assertEqual(view.get_paths_for_node('child'), [('child',)])
         node0.add_color('red')
         path0 = view.get_paths_for_node('0')[0]
         pathchild = path0 + ('child',)
-        self.assertEqual(view.node_parents('child'),['0'])
-        self.assertEqual(view.get_paths_for_node('child'),[pathchild])
-        
+        self.assertEqual(view.node_parents('child'), ['0'])
+        self.assertEqual(view.get_paths_for_node('child'), [pathchild])
+
     def test_addchild_with_late_parent(self):
         '''Add a child to a node which is not yet in the tree. 
         We also check with a callback that the path sent is well
@@ -526,8 +562,8 @@ class TestLibLarch(unittest.TestCase):
             #the test will fail if there's any inconsistencies.
             view.print_tree(string=True)
         view = self.tree.get_viewtree(refresh=True)
-        view.register_cllbck('node-modified-inview',check_path)
-        view.register_cllbck('node-deleted-inview',printtree)
+        view.register_cllbck('node-modified-inview', check_path)
+        view.register_cllbck('node-deleted-inview', printtree)
         node = DummyNode('child')
         node2 = DummyNode('futur')
         node3 = DummyNode('child2')
@@ -539,8 +575,8 @@ class TestLibLarch(unittest.TestCase):
         self.assertTrue('child' in all_nodes)
         self.assertTrue('child2' in all_nodes)
         self.assertFalse('futur' in all_nodes)
-        self.assertEqual(len(view.node_parents('child')),0)
-        self.assertEqual(len(view.node_parents('child2')),0)
+        self.assertEqual(len(view.node_parents('child')), 0)
+        self.assertEqual(len(view.node_parents('child2')), 0)
         #now inserting the parent
         view.apply_filter('leaf')
         self.tree.add_node(node2)
@@ -556,7 +592,9 @@ class TestLibLarch(unittest.TestCase):
         self.assertTrue('futur' in view.node_parents('child2'))
         
     def test_addparent_with_late_child(self):
-        '''Add a child not yet in the tree to a node'''
+        """
+        Add a child not yet in the tree to a node
+        """
         view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('parent')
         node2 = DummyNode('futur')
@@ -565,7 +603,7 @@ class TestLibLarch(unittest.TestCase):
         all_nodes = view.get_all_nodes()
         self.assertTrue('parent' in all_nodes)
         self.assertFalse('futur' in all_nodes)
-        self.assertEqual(view.node_n_children('parent'),0)
+        self.assertEqual(view.node_n_children('parent'), 0)
         #now inserting the parent
         view.apply_filter('leaf')
         self.tree.add_node(node2)
@@ -596,9 +634,9 @@ class TestLibLarch(unittest.TestCase):
         #look, we miss the node 2 !
         self.tree.add_node(node3)
         self.tree.add_node(node4)
-        self.assertEqual(view.node_n_children('parent'),3)
+        self.assertEqual(view.node_n_children('parent'), 3)
         self.tree.add_node(node2)
-        self.assertEqual(view.node_n_children('parent'),4)
+        self.assertEqual(view.node_n_children('parent'), 4)
         
     def test_late_first_child(self):
         '''Futur2 is the child of parent
@@ -615,13 +653,13 @@ class TestLibLarch(unittest.TestCase):
         self.tree.add_node(node)
         self.tree.add_node(node2)
         #Look, we didn't add futur1
-        self.assertEqual(view.node_n_children('parent'),1)
-        self.assertEqual(view.node_n_children('futur2'),0)
+        self.assertEqual(view.node_n_children('parent'), 1)
+        self.assertEqual(view.node_n_children('futur2'), 0)
         self.assertFalse(view.is_displayed('futur1'))
         #Now we add it !
         self.tree.add_node(node1)
-        self.assertEqual(view.node_n_children('parent'),2)
-        self.assertEqual(view.node_n_children('futur2'),1)
+        self.assertEqual(view.node_n_children('parent'), 2)
+        self.assertEqual(view.node_n_children('futur2'), 1)
         self.assertTrue(view.is_displayed('futur1'))
         
     def test_move_node_to_a_multiple_parent(self):
@@ -633,13 +671,14 @@ class TestLibLarch(unittest.TestCase):
         self.tree.del_node('3')
         self.assertFalse(self.tree.has_node('3'))
         self.tree.add_node(node3,parent_id='13')
-        self.assertEqual(len(view.get_paths_for_node('3')),3)
+        self.assertEqual(len(view.get_paths_for_node('3')), 3)
         self.tree.del_node('3')
         self.tree.move_node('4','13')
-        self.assertEqual(len(view.get_paths_for_node('4')),3)
+        self.assertEqual(len(view.get_paths_for_node('4')), 3)
         
     def test_recursive_removing_parent(self):
-        """Test behavior of node when its parent goes away.
+        """
+        Test behavior of node when its parent goes away.
 
         When you remove a parent recursively, all the children
         are also removed !
@@ -651,9 +690,12 @@ class TestLibLarch(unittest.TestCase):
         all_nodes = self.view.get_all_nodes()
         self.assertTrue('0' in all_nodes)
         self.assertTrue('temp' in all_nodes)
-        self.assertSignal(self.view, \
-                          'node-deleted-inview', \
-                          self.tree.del_node, 1)('0', recursive = True)
+        self.assertSignal(
+            self.view,
+            'node-deleted-inview',
+            self.tree.del_node,
+            1
+        )('0', recursive = True)
         self.assertTrue(('temp',('0', 'temp')) in\
                                  self.recorded_signals['node-deleted-inview'])
         all_nodes = self.view.get_all_nodes()
@@ -661,7 +703,8 @@ class TestLibLarch(unittest.TestCase):
         self.assertFalse('temp' in all_nodes)
 
     def test_move_node(self):
-        """Test node movement from parents.
+        """
+        Test node movement from parents.
 
         Check that node can be moved from one node to another,
         and to root.  When moved to root, verify it has no parents.
@@ -691,7 +734,7 @@ class TestLibLarch(unittest.TestCase):
         #temp still exist and doesn't have any parents
         all_nodes = self.mainview.get_all_nodes()
         self.assertTrue('temp' in all_nodes)
-        self.assertEqual(0,len(self.mainview.node_parents('temp')))
+        self.assertEqual(0, len(self.mainview.node_parents('temp')))
 
     def test_add_parent(self):
         """Test that a node can have two parents.
@@ -715,7 +758,7 @@ class TestLibLarch(unittest.TestCase):
         #Adding another parent
         self.assertSignal(self.view, \
                           'node-modified-inview', \
-                          self.tree.add_parent, 1)('temp','1')
+                          self.tree.add_parent, 1)('temp', '1')
         self.assertTrue(('1',('1',)) in self.recorded_signals['node-modified-inview'])
         self.assertTrue(view.node_has_child('1'))
         self.assertTrue('temp' in view.node_all_children('1'))
@@ -746,7 +789,7 @@ class TestLibLarch(unittest.TestCase):
         Test that mainview is always up-to-date and raise exception when
         trying to add filters on it
         """
-        self.assertRaises(Exception,self.mainview.apply_filter,'blue')
+        self.assertRaises(Exception, self.mainview.apply_filter, 'blue')
         
     #### Testing each method of the ViewTree
     
@@ -758,34 +801,36 @@ class TestLibLarch(unittest.TestCase):
         the expected collections.
         """
         total = self.red_nodes + self.blue_nodes + self.green_nodes
-        self.assertEqual(total,self.view.get_n_nodes())
-        self.assertEqual(self.green_nodes,self.view.get_n_nodes(withfilters=['green']))
-        self.assertEqual(total,self.mainview.get_n_nodes())
+        self.assertEqual(total, self.view.get_n_nodes())
+        self.assertEqual(self.green_nodes, self.view.get_n_nodes(withfilters=['green']))
+        self.assertEqual(total, self.mainview.get_n_nodes())
         
     def test_viewtree_get_n_nodes_with_cache(self):
-        '''Testing the cache of the get_n_nodes'''
+        """
+        Testing the cache of the get_n_nodes
+        """
         nbr = self.green_nodes
-        self.assertEqual(nbr,self.mainview.get_n_nodes(\
-                            withfilters=['green'],include_transparent=False))
+        self.assertEqual(nbr, self.mainview.get_n_nodes(\
+                            withfilters=['green'], include_transparent=False))
         node = self.tree.get_node('0')
         node.add_color('green')
         
-        self.assertEqual(nbr+1,self.mainview.get_n_nodes(\
-                            withfilters=['green'],include_transparent=False))
+        self.assertEqual(nbr+1, self.mainview.get_n_nodes(\
+                            withfilters=['green'], include_transparent=False))
         node.remove_color('green')
-        self.assertEqual(nbr,self.mainview.get_n_nodes(\
-                            withfilters=['green'],include_transparent=False))
+        self.assertEqual(nbr, self.mainview.get_n_nodes(\
+                            withfilters=['green'], include_transparent=False))
     
     def test_viewtree_get_all_nodes(self):
         all_nodes = self.view.get_all_nodes()
         all_nodes2 = self.mainview.get_all_nodes()
-        self.assertEqual(True,'0' in all_nodes)
-        self.assertEqual(False,'tmp' in all_nodes)
-        self.assertEqual(self.total,len(all_nodes))
+        self.assertEqual(True, '0' in all_nodes)
+        self.assertEqual(False, 'tmp' in all_nodes)
+        self.assertEqual(self.total, len(all_nodes))
         #Mainview
-        self.assertEqual(True,'0' in all_nodes2)
-        self.assertEqual(False,'tmp' in all_nodes2)
-        self.assertEqual(self.total,len(all_nodes2))
+        self.assertEqual(True, '0' in all_nodes2)
+        self.assertEqual(False, 'tmp' in all_nodes2)
+        self.assertEqual(self.total, len(all_nodes2))
         #adding a node
         node = DummyNode('temp')
         node.add_color('blue')
@@ -794,22 +839,22 @@ class TestLibLarch(unittest.TestCase):
         all_nodes2 = self.mainview.get_all_nodes()
         self.assertTrue('0' in all_nodes)
         self.assertTrue('temp' in all_nodes)
-        self.assertEqual(self.total+1,len(all_nodes))
+        self.assertEqual(self.total+1, len(all_nodes))
         #Mainview
         self.assertTrue('0' in all_nodes2)
         self.assertTrue('temp' in all_nodes2)
-        self.assertEqual(self.total+1,len(all_nodes2))
+        self.assertEqual(self.total+1, len(all_nodes2))
         #Removing the node
         self.tree.del_node('1')
         all_nodes = self.view.get_all_nodes()
         all_nodes2 = self.mainview.get_all_nodes()
         self.assertFalse('1' in all_nodes)
         self.assertTrue('temp' in all_nodes)
-        self.assertEqual(self.total,len(all_nodes))
+        self.assertEqual(self.total, len(all_nodes))
         #mainview
         self.assertFalse('1' in all_nodes2)
         self.assertTrue('temp' in all_nodes2)
-        self.assertEqual(self.total,len(all_nodes2))
+        self.assertEqual(self.total, len(all_nodes2))
         
         
     def test_viewtree_get_node_for_path(self):
@@ -822,40 +867,46 @@ class TestLibLarch(unittest.TestCase):
         #Thus we do a mix of test.
         nid1b = view.next_node(nid1)
         path1b = view.get_paths_for_node(nid1b)
-        self.assertEqual([(nid1b,)],path1b)
+        self.assertEqual([(nid1b,)], path1b)
         #same for mainview
         nid2b = self.mainview.next_node(nid2)
         path2b = self.mainview.get_paths_for_node(nid2b)
-        self.assertEqual([(nid2b,)],path2b)
+        self.assertEqual([(nid2b,)], path2b)
         #with children
         node = DummyNode('temp')
         node.add_color('blue')
-        self.tree.add_node(node,parent_id=nid1)
-        self.tree.add_parent('temp',nid2)
-        self.assertEqual('temp',self.mainview.get_node_for_path((nid1,'temp')))
-        self.assertEqual('temp',view.get_node_for_path((nid2,'temp')))
+        self.tree.add_node(node, parent_id=nid1)
+        self.tree.add_parent('temp', nid2)
+        self.assertEqual('temp', self.mainview.get_node_for_path((nid1, 'temp')))
+        self.assertEqual('temp', view.get_node_for_path((nid2, 'temp')))
         #Adding a child to the child
         node2 = DummyNode('temp2')
         node2.add_color('blue')
-        self.tree.add_node(node2,parent_id=nid1)
+        self.tree.add_node(node2, parent_id=nid1)
         node = DummyNode('temp_child')
         node.add_color('blue')
         self.tree.add_node(node,parent_id='temp2')
-        self.assertEqual('temp_child',view.get_node_for_path((nid1,'temp2','temp_child')))
-        self.tree.add_parent('temp2',nid2)
-        self.assertEqual('temp_child',self.mainview.get_node_for_path((nid2,'temp2','temp_child')))
+        self.assertEqual(
+            'temp_child',
+            view.get_node_for_path((nid1, 'temp2', 'temp_child'))
+        )
+        self.tree.add_parent('temp2', nid2)
+        self.assertEqual(
+            'temp_child',
+            self.mainview.get_node_for_path((nid2, 'temp2', 'temp_child'))
+        )
         #with filters
         view.apply_filter('blue')
         pl = view.get_paths_for_node('temp2')
         for p in pl:
             pp = p + ('temp_child',)
-            self.assertEqual('temp_child',view.get_node_for_path(pp))
-        
+            self.assertEqual('temp_child', view.get_node_for_path(pp))
+
     def test_viewtree_get_paths_for_node(self):
         view = self.tree.get_viewtree(refresh=True)
         #testing the root path
-        self.assertEqual([()],view.get_paths_for_node())
-        self.assertEqual([()],self.mainview.get_paths_for_node())
+        self.assertEqual([()], view.get_paths_for_node())
+        self.assertEqual([()], self.mainview.get_paths_for_node())
         #with children
         #the first blue node is:
         firstgreen = self.red_nodes + self.blue_nodes - 1
@@ -864,7 +915,7 @@ class TestLibLarch(unittest.TestCase):
         #Testing all the green nodes (that are in stairs)
         while i < self.green_nodes:
             returned = view.get_paths_for_node(str(firstgreen+i))[0]
-            self.assertEqual(pp,returned)
+            self.assertEqual(pp, returned)
             i+=1
             pp += (str(firstgreen+i),)
         #with filters
@@ -874,7 +925,7 @@ class TestLibLarch(unittest.TestCase):
         #Testing all the green nodes (that are in stairs)
         while i < self.green_nodes:
             returned = view.get_paths_for_node(str(firstgreen+i))[0]
-            self.assertEqual(pp,returned)
+            self.assertEqual(pp, returned)
             i+=1
             pp += (str(firstgreen+i),)
         
@@ -888,32 +939,33 @@ class TestLibLarch(unittest.TestCase):
         node = DummyNode('temp')
         node.add_color('blue')
         node.add_color('green')
-        self.tree.add_node(node,parent_id='0')
+        self.tree.add_node(node, parent_id='0')
         view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('temp2')
         node.add_color('red')
-        self.tree.add_node(node,parent_id='0')
+        self.tree.add_node(node, parent_id='0')
         #we give the pid
-        self.assertEqual('temp2',view.next_node('temp',pid='0'))
-        self.assertEqual('temp2',self.mainview.next_node('temp',pid='0'))
+        self.assertEqual('temp2', view.next_node('temp', pid='0'))
+        self.assertEqual('temp2', self.mainview.next_node('temp', pid='0'))
         #or we give not (should be the same here because only one parent)
-        self.assertEqual('temp2',view.next_node('temp'))
-        self.assertEqual('temp2',self.mainview.next_node('temp'))
+        self.assertEqual('temp2', view.next_node('temp'))
+        self.assertEqual('temp2', self.mainview.next_node('temp'))
         #next node for last node.
-        self.assertEqual(None,view.next_node('temp2'))
-        self.assertEqual(None,self.mainview.next_node('temp2'))
+        self.assertEqual(None, view.next_node('temp2'))
+        self.assertEqual(None, self.mainview.next_node('temp2'))
         #with filters, temp should not have any next node
-        view.apply_filter('blue',refresh=False)
+        view.apply_filter('blue', refresh=False)
         view.apply_filter('green')
-        self.assertEqual(None,view.next_node('temp'))
+        self.assertEqual(None, view.next_node('temp'))
 
     def test_viewtree_node_has_child(self):
-        view = self.tree.get_viewtree(refresh=True)
-        """Test node_has_child() for TreeView
+        """
+        Test node_has_child() for TreeView
 
         Verify that TreeView's node_n_children()'s return changes after
         a node is added to an empty TreeView instance.
         """
+        view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('temp')
         node.add_color('blue')
         self.assertFalse(view.node_has_child('0'))
@@ -939,7 +991,8 @@ class TestLibLarch(unittest.TestCase):
     def test_viewtree_node_all_children(self):
         view = self.tree.get_viewtree(refresh=True)
         self.assertEqual(0,len(view.node_all_children('0')))
-        """Test node_all_children() for TreeView.
+        """
+        Test node_all_children() for TreeView.
 
         We also test node_n_children here. Nearly the same method.
         """
@@ -961,31 +1014,32 @@ class TestLibLarch(unittest.TestCase):
         self.assertFalse('temp' in view.node_all_children('0'))
         view.unapply_filter('red')
         #moving an existing children
-        self.tree.move_node('1','0')
-        self.assertEqual(2,view.node_n_children('0'))
+        self.tree.move_node('1', '0')
+        self.assertEqual(2, view.node_n_children('0'))
         self.assertTrue('1' in view.node_all_children('0'))
         self.assertFalse('1' in view.node_all_children())
-        self.assertEqual(2,self.mainview.node_n_children('0'))
+        self.assertEqual(2, self.mainview.node_n_children('0'))
         self.assertTrue('1' in self.mainview.node_all_children('0'))
         self.assertFalse('1' in self.mainview.node_all_children())
         #removing a node
         self.tree.del_node('temp')
-        self.assertEqual(1,view.node_n_children('0'))
+        self.assertEqual(1, view.node_n_children('0'))
         self.assertFalse('temp' in view.node_all_children('0'))
-        self.assertEqual(1,self.mainview.node_n_children('0'))
+        self.assertEqual(1, self.mainview.node_n_children('0'))
         self.assertFalse('temp' in self.mainview.node_all_children('0'))
         #moving a node elsewhere
         self.tree.move_node('1')
-        self.assertEqual(0,view.node_n_children('0'))
+        self.assertEqual(0, view.node_n_children('0'))
         self.assertFalse('1' in view.node_all_children('0'))
-        self.assertEqual(0,self.mainview.node_n_children('0'))
+        self.assertEqual(0, self.mainview.node_n_children('0'))
         self.assertFalse('1' in self.mainview.node_all_children('0'))
         #checking that '1' is back in root
         self.assertTrue('1' in view.node_all_children())
         self.assertTrue('1' in self.mainview.node_all_children())
         
     def test_viewtree_node_nth_child(self):
-        """Test node_nth_child() for TreeView.
+        """
+        Test node_nth_child() for TreeView.
 
         Verify that when retrieving a given child node, that it is
         returned, except when requesting a node not in the tree or that
@@ -1004,29 +1058,29 @@ class TestLibLarch(unittest.TestCase):
         #Now with a filter
         view.apply_filter('red')
         self.assertRaises(ValueError,view.node_nth_child,'0',0)
-        
-        
+
     def test_viewtree_node_parents(self):
-        view = self.tree.get_viewtree(refresh=True)
-        """Test node_parents() for TreeView.
+        """
+        Test node_parents() for TreeView.
 
         Verify that a node's parents can be retrieved, if it has any.
         Check that if a node has multiple parents, that both parents are
         returned.
         """
+        view = self.tree.get_viewtree(refresh=True)
         #Checking that a node at the root has no parents
-        self.assertEqual([],view.node_parents('0'))
-        self.assertEqual([],self.mainview.node_parents('0'))
+        self.assertEqual([], view.node_parents('0'))
+        self.assertEqual([], self.mainview.node_parents('0'))
         #Adding a child
         node = DummyNode('temp')
         node.add_color('blue')
-        self.tree.add_node(node,parent_id='0')
-        self.assertEqual(['0'],view.node_parents('temp'))
-        self.assertEqual(['0'],self.mainview.node_parents('temp'))
+        self.tree.add_node(node, parent_id='0')
+        self.assertEqual(['0'], view.node_parents('temp'))
+        self.assertEqual(['0'], self.mainview.node_parents('temp'))
         #adding a second node.add_child('0')parent
-        self.tree.add_parent('temp','1')
-        self.assertEqual(['0','1'],view.node_parents('temp'))
-        self.assertEqual(['0','1'],self.mainview.node_parents('temp'))
+        self.tree.add_parent('temp', '1')
+        self.assertEqual(['0', '1'], view.node_parents('temp'))
+        self.assertEqual(['0', '1'], self.mainview.node_parents('temp'))
         #now with a filter
         view.apply_filter('blue')
         self.assertEqual([],view.node_parents('temp'))
@@ -1034,15 +1088,16 @@ class TestLibLarch(unittest.TestCase):
         view.unapply_filter('blue')
         view.apply_filter('red')
         self.assertRaises(IndexError,view.node_parents,'temp')
-        
 
     def test_viewtree_is_displayed(self):
-        view = self.tree.get_viewtree(refresh=True)
-        """Test is_displayed() for TreeView.
+        """
+        Test is_displayed() for TreeView.
 
         Verify that a node is shown as displayed once it's been added
         to the tree, but not if an active filter should be hiding it.
         """
+
+        view = self.tree.get_viewtree(refresh=True)
         node = DummyNode('temp')
         node.add_color('blue')
         self.assertFalse(view.is_displayed('temp'))
@@ -1057,15 +1112,11 @@ class TestLibLarch(unittest.TestCase):
         self.assertFalse(view.is_displayed('temp'))
 
 
-
-
-
 ############ Filters
 
     def test_simple_filter(self):
-        view = self.tree.get_viewtree(refresh=False)
-        test = TreeTester(view)
-        """Test use of filters to restrict nodes shown.
+        """
+        Test use of filters to restrict nodes shown.
 
         When the 'red' filter is applied, only nodes with the 'red' color
         should be returned.  Applying the 'blue' filter on top of that should
@@ -1079,33 +1130,35 @@ class TestLibLarch(unittest.TestCase):
         When a displayed node is added to a non-displayed parent, it
         should still be displayed.
         """
+        view = self.tree.get_viewtree(refresh=False)
+        test = TreeTester(view)
         view.apply_filter('red')
         test.test_validity()
         self.assertEqual(self.red_nodes,view.get_n_nodes())
         self.assertEqual(self.red_nodes,view.get_n_nodes(withfilters=['red']))
-        self.assertEqual(0,view.get_n_nodes(withfilters=['blue']))
+        self.assertEqual(0, view.get_n_nodes(withfilters=['blue']))
         #Red nodes are all at the root
-        self.assertEqual(self.red_nodes,view.node_n_children())
+        self.assertEqual(self.red_nodes, view.node_n_children())
         #applying another filter
         view.apply_filter('green')
         test.test_validity()
-        self.assertEqual(0,view.get_n_nodes())
+        self.assertEqual(0, view.get_n_nodes())
         #unapplying the first filter
         view.unapply_filter('red')
         test.test_validity()
-        self.assertEqual(self.green_nodes,view.get_n_nodes())
-        self.assertEqual(self.green_nodes,view.get_n_nodes(withfilters=['green']))
-        self.assertEqual(0,view.get_n_nodes(withfilters=['red']))
+        self.assertEqual(self.green_nodes, view.get_n_nodes())
+        self.assertEqual(self.green_nodes, view.get_n_nodes(withfilters=['green']))
+        self.assertEqual(0, view.get_n_nodes(withfilters=['red']))
         #There's only one green node at the root
-        self.assertEqual(1,view.node_n_children())
+        self.assertEqual(1, view.node_n_children())
         #Modifying a node to make it red and green
         self.assertFalse(view.is_displayed('0'))
         node = view.get_node('0')
         node.add_color('green')
         #It should now be in the view
         self.assertTrue(view.is_displayed('0'))
-        self.assertEqual(1,view.get_n_nodes(withfilters=['red']))
-        self.assertEqual(2,view.node_n_children())
+        self.assertEqual(1, view.get_n_nodes(withfilters=['red']))
+        self.assertEqual(2, view.node_n_children())
         #Now, we add a new node
         node = DummyNode('temp')
         node.add_color('green')
@@ -1113,51 +1166,52 @@ class TestLibLarch(unittest.TestCase):
         test.test_validity()
         #It should now be in the view
         self.assertTrue(view.is_displayed('temp'))
-        self.assertEqual(3,view.node_n_children())
+        self.assertEqual(3, view.node_n_children())
         #We remove it
         self.tree.del_node('temp')
         test.test_validity()
         self.assertFalse(view.is_displayed('temp'))
-        self.assertEqual(2,view.node_n_children())
+        self.assertEqual(2, view.node_n_children())
         #We add it again as a children of a non-displayed node
-        self.tree.add_node(node,parent_id='1')
+        self.tree.add_node(node, parent_id='1')
         test.test_validity()
         self.assertTrue(view.is_displayed('temp'))
-        self.assertEqual(3,view.node_n_children())
+        self.assertEqual(3, view.node_n_children())
         #It should not have parent
-        self.assertEqual(0,len(view.node_parents('temp')))
+        self.assertEqual(0, len(view.node_parents('temp')))
 
     def test_leaf_filter(self):
-        view = self.tree.get_viewtree(refresh=False)
-        test = TreeTester(view)
-        """Test filtering to show only the leaf nodes.
+        """
+        Test filtering to show only the leaf nodes.
 
         When the 'leaf' filter is applied and a child added to a node,
         the parent node should not be present in the results.
         """
+        view = self.tree.get_viewtree(refresh=False)
+        test = TreeTester(view)
         view.apply_filter('leaf')
         total = self.red_nodes + self.blue_nodes
-        self.assertEqual(total,view.get_n_nodes())
+        self.assertEqual(total, view.get_n_nodes())
         view.apply_filter('green')
-        self.assertEqual(1,view.get_n_nodes())
+        self.assertEqual(1, view.get_n_nodes())
         nid = view.get_node_for_path(('14',))
         #Now, we add a new node
         node = DummyNode('temp')
         node.add_color('green')
-        self.tree.add_node(node,parent_id='14')
-        self.assertEqual(1,view.get_n_nodes())
+        self.tree.add_node(node, parent_id='14')
+        self.assertEqual(1, view.get_n_nodes())
         nid = view.get_node_for_path(('temp',))
-        self.assertEqual('temp',nid)
+        self.assertEqual('temp', nid)
         #Only one node should be there
         self.assertEqual(1,view.get_n_nodes())
         #14 should not be there
         self.assertFalse(view.is_displayed('14'))
         #Now we remove 'temp' from the tree
         self.tree.del_node('temp')
-        self.assertEqual(1,view.get_n_nodes())
+        self.assertEqual(1, view.get_n_nodes())
         self.assert_(view.is_displayed('14'))
         test.test_validity()
-        
+
     def test_green_leaf(self):
         """We apply a green and leaf filter then we remove the green
         from one of the leaf node and the green parent should be displayed"""
@@ -1344,22 +1398,23 @@ class TestLibLarch(unittest.TestCase):
             nodes_id.append(node.get_id())
             self.tree.add_node(node)
         end = time.time()
-        print "\nADDING %d NODES: %f" % (BIG_NUMBER, end - start)
+        print("\nADDING {0} NODES: {1}".format(BIG_NUMBER, end-start))
 
         start = time.time()
         for node_id in nodes_id:
             self.tree.refresh_node(node_id)
         end = time.time()
-        print "\nUPDATING %d NODES: %f" % (BIG_NUMBER, end - start)
+        print("\nUPDATING {0} NODES: {1}".format(BIG_NUMBER, end-start))
 
         start = time.time()
         for node_id in nodes_id:
             self.tree.del_node(node_id)
         end = time.time()
-        print "\nDELETING %d NODES: %f" % (BIG_NUMBER, end - start)
+        print("\nDELETING {0} NODES: {1}".format(BIG_NUMBER, end-start))
 
     def test_remove_grand_grand_parent(self):
-        """ Remove from tree a node which is parent of child 
+        """
+        Remove from tree a node which is parent of child 
         which is also parent.
 
         Using example tree from setUp()
@@ -1402,8 +1457,9 @@ class TestLibLarch(unittest.TestCase):
 
         # Testing expected parents => (node, [parents])
         relationships = [
-            (0,[]), (1,[]), (2,[]), (3,[]), (4,[]), (5,[]), (6,[]), (7,[]), (8,[]),
-            (10,[]), (11,[10]), (12,[11]), (13,[12]), (14,[13]),
+            (0, []), (1, []), (2, []), (3, []), (4, []), (5, []), (6, []),
+            (7, []), (8, []), (10, []), (11, [10]), (12, [11]), (13, [12]),
+            (14,[13]),
         ]
 
         for node_id, parents in relationships:
@@ -1697,8 +1753,10 @@ class TestLibLarch(unittest.TestCase):
                 self.tree.del_node(node_id, True)
 
     def test_remove_recursively_clean(self):
-        """ Test that when we have task with many subtasks,
-        all will be removed and no will left in tree """
+        """
+        Test that when we have task with many subtasks,
+        all will be removed and no will left in tree
+        """
         N = 50
         prefix = "child_"
 
@@ -1724,20 +1782,20 @@ class TestLibLarch(unittest.TestCase):
             self.testvalue += x
         self.tree = Tree()
         self.view = self.tree.get_viewtree()
-        self.tree.add_filter('blue',self.is_blue)
-        self.tree.add_filter('green',self.is_green)
+        self.tree.add_filter('blue', self.is_blue)
+        self.tree.add_filter('green', self.is_green)
         self.view.apply_filter('green')
         bl = DummyNode('bl')
         bl.add_color('blue')
         gr = DummyNode('gr')
         gr.add_color('green')
-        self.view.queue_action('bl',action,1)
-        self.view.queue_action('gr',action,2)
-        self.assertEqual(self.testvalue,0)
+        self.view.queue_action('bl', action, 1)
+        self.view.queue_action('gr', action, 2)
+        self.assertEqual(self.testvalue, 0)
         self.tree.add_node(bl)
-        self.assertEqual(self.testvalue,0)
+        self.assertEqual(self.testvalue, 0)
         self.tree.add_node(gr)
-        self.assertEqual(self.testvalue,2)
+        self.assertEqual(self.testvalue, 2)
         
     def test_queue_action_multiples_actions(self):
         self.testvalue = 0
@@ -1745,33 +1803,33 @@ class TestLibLarch(unittest.TestCase):
             self.testvalue += x
         self.tree = Tree()
         self.view = self.tree.get_viewtree()
-        self.tree.add_filter('blue',self.is_blue)
-        self.tree.add_filter('green',self.is_green)
+        self.tree.add_filter('blue', self.is_blue)
+        self.tree.add_filter('green', self.is_green)
         self.view.apply_filter('green')
         bl = DummyNode('bl')
         bl.add_color('blue')
         gr = DummyNode('gr')
         gr.add_color('green')
-        self.view.queue_action('bl',action,1)
-        self.view.queue_action('bl',action,3)
-        self.view.queue_action('gr',action,2)
-        self.assertEqual(self.testvalue,0)
+        self.view.queue_action('bl', action, 1)
+        self.view.queue_action('bl', action, 3)
+        self.view.queue_action('gr', action, 2)
+        self.assertEqual(self.testvalue, 0)
         self.tree.add_node(bl)
-        self.assertEqual(self.testvalue,0)
+        self.assertEqual(self.testvalue, 0)
         self.tree.add_node(gr)
-        self.assertEqual(self.testvalue,2)
+        self.assertEqual(self.testvalue, 2)
         self.view.unapply_filter('green')
         #test value should be 2 + 1 + 3 = 6
-        self.assertEqual(self.testvalue,6)
+        self.assertEqual(self.testvalue, 6)
         
         
     def test_recursive_count(self):
         self.value = 0
         self.view = self.tree.get_viewtree()
-        def update(x,path):
+        def update(x, path):
             if x == '0':
-                self.value = self.view.node_n_children(x,recursive=True)
-        self.view.register_cllbck('node-modified-inview',update)
+                self.value = self.view.node_n_children(x, recursive=True)
+        self.view.register_cllbck('node-modified-inview', update)
         a = DummyNode('a')
         b = DummyNode('b')
         c = DummyNode('c')
@@ -1779,24 +1837,26 @@ class TestLibLarch(unittest.TestCase):
         d.add_color('blue')
         zero = self.tree.get_node('0')
         zero.add_color('blue')
-        self.assertEqual(self.value,0)
-        self.tree.add_node(a,'0')
-        self.assertEqual(self.value,1)
-        self.tree.add_node(b,'a')
-        self.assertEqual(self.value,2)
-        self.tree.add_node(c,'b')
-        self.assertEqual(self.value,3)
-        self.tree.add_node(d,'0')
-        self.assertEqual(self.value,4)
+        self.assertEqual(self.value, 0)
+        self.tree.add_node(a, '0')
+        self.assertEqual(self.value, 1)
+        self.tree.add_node(b, 'a')
+        self.assertEqual(self.value, 2)
+        self.tree.add_node(c, 'b')
+        self.assertEqual(self.value, 3)
+        self.tree.add_node(d, '0')
+        self.assertEqual(self.value, 4)
         self.tree.del_node('b')
-        self.assertEqual(self.value,2)
+        self.assertEqual(self.value, 2)
         self.view.apply_filter('blue')
-        self.assertEqual(self.value,1)     
+        self.assertEqual(self.value, 1)
 
     def test_performance_of_filter_counting(self):
-        """ Simulate counting tags as in GTG use case.
+        """
+        Simulate counting tags as in GTG use case.
 
-        For every update in main tree, recount every tag filter """
+        For every update in main tree, recount every tag filter
+        """
         # FIXME
         # Super exterme task count
         # Optimal time is 0.917s
@@ -1815,7 +1875,9 @@ class TestLibLarch(unittest.TestCase):
         random.seed(42)
 
         def create_filter_func(tag):
-            """ We need to create a closure to generate filter functions """
+            """
+            We need to create a closure to generate filter functions
+            """
             return lambda node, parameters=None: node.has_color(tag)
 
         # add filters
@@ -1825,7 +1887,9 @@ class TestLibLarch(unittest.TestCase):
             self.tree.add_filter(tag, create_filter_func(tag))
 
         def recount(node, path):
-            """ Make all tags to recount """
+            """
+            Make all tags to recount
+            """
             for tag in tags:
                 count = view.get_n_nodes(withfilters=[tag], include_transparent=False)
                 self.assertEqual(count, num_tags[tag])
@@ -1840,12 +1904,12 @@ class TestLibLarch(unittest.TestCase):
         for task in range(TASK_COUNT):
             task_id = 'task_%d' % task
             node = DummyNode(task_id)
-            
+
             tag_count = random.randint(0, MAX_TAGS_PER_TASK)
             for tag in random.sample(tags, tag_count):
                 num_tags[tag] += 1
                 node.add_color(tag)
-            
+
             if random.randint(0, 100) < PROP_OF_CHILDREN:
                 if parents != []:
                     parent_id = random.choice(parents)
@@ -1857,7 +1921,8 @@ class TestLibLarch(unittest.TestCase):
                 parents = []
 
             self.tree.add_node(node, parent_id=parent_id)
-        
 
 def test_suite():
     return unittest.TestLoader().loadTestsFromName(__name__)
+
+# -----------------------------------------------------------------------------
