@@ -18,6 +18,11 @@
 
 # Simple makefile for common tasks
 
+PYTHON ?= python
+
+.PHONY: clean clean-pyc clean-patchfiles clean-backupfiles \
+        clean-generated clean-pylint pylint pylint-report test build develop
+
 test:
 	./run-tests
 
@@ -27,9 +32,38 @@ sdist:
 ppa:
 	./build_packages remote-deb
 
-# Remove .pyc files
-clean:
-	find -type f -iname '*.pyc' -exec rm {} \;
-	find -type f -iname '*.~*~' -exec rm {} \;
-	rm -f *.bak
-	rm -rf dist/
+pylint:
+	-@pylint --rcfile pylintrc liblarch liblarch_gtk
+
+pylint-report:
+	-@pylint --rcfile pylintrc --output-format=html liblarch > liblarch.html
+	-@pylint --rcfile pylintrc --output-format=html liblarch_gtk > liblarch_gtk.html
+
+build:
+	@$(PYTHON) setup.py build
+
+develop:
+	@$(PYTHON) setup.py develop
+
+clean: clean-pyc clean-patchfiles clean-backupfiles clean-generated clean-dist \
+       clean-pylint
+
+# Remove .py[c,o] files
+clean-pyc:
+	-@find . -type f -iname '*.pyc' -exec rm -f {} +
+	-@find . -type f -iname '*.pyo' -exec rm -f {} +
+
+clean-patchfiles:
+	-@find . -name '*.orig' -exec rm -f {} +
+	-@find . -name '*.rej' -exec rm -f {} +
+
+clean-backupfiles:
+	-@find . -name '*~' -exec rm -f {} +
+	-@find . -type f -iname '*.bak' -exec rm -f {} +
+
+clean-dist:
+	-@rm -rf dist/
+
+clean-pylint:
+	-@rm -f liblarch.html
+	-@rm -f liblarch_gtk.html
