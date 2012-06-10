@@ -617,13 +617,15 @@ class FilteredTree(object):
             raise Exception("Calling next_node on the root node")
 
         if node_id not in self.nodes:
-            raise Exception("Node %s is not displayed" % node_id)
+            raise Exception("Node {0} is not displayed".format(node_id))
 
         parents = self.nodes[node_id]['parents']
         if not parent_id:
             parent_id = parents[0]
         elif parent_id not in parents:
-            raise Exception("Node %s does not have parent %s" % (node_id, parent_id))
+            raise Exception(
+                "Node {0} does not have parent {1}".format(node_id, parent_id)
+            )
 
         index = self.nodes[parent_id]['children'].index(node_id)
         if index+1 < len(self.nodes[parent_id]['children']):
@@ -669,7 +671,7 @@ class FilteredTree(object):
 
     def get_current_state(self):
         """ Allows to connect LibLarch widget on fly to FilteredTree
-        
+
         Sends 'added' signal/callback for every nodes that is currently
         in FilteredTree. After that, FilteredTree and TreeModel are
         in the same state
@@ -683,13 +685,14 @@ class FilteredTree(object):
 
     def apply_filter(self, filter_name, parameters=None, \
                     reset=None, refresh=None):
-        """ Apply a new filter to the tree.
+        """
+        Apply a new filter to the tree.
 
-        @param filter_name: The name of an registrered filter from filters_bank
-        @param parameters: Optional parameters to pass to the filter
-        @param reset: Should other filters be removed?
-        @param refresh: Should be refereshed the whole tree?
-                (performance optimization)
+        :filter_name: The name of an registrered filter from filters_bank
+        :parameters: Optional parameters to pass to the filter
+        :reset: Should other filters be removed?
+        :refresh: Should be refereshed the whole tree?
+                  (performance optimization)
         """
         if reset:
             self.applied_filters = []
@@ -715,9 +718,9 @@ class FilteredTree(object):
         """
         Removes a filter from the tree.
 
-        @param filter_name: The name of an already added filter to remove
-        @param refresh: Should be refereshed the whole tree?
-                (performance optimization)
+        :filter_name: The name of an already added filter to remove
+        :refresh: Should be refereshed the whole tree?
+                  (performance optimization)
         """
         if filter_name in self.applied_filters:
             self.applied_filters.remove(filter_name)

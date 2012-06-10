@@ -18,10 +18,17 @@
 
 # Simple makefile for common tasks
 
+# The default python interpreter used by make
 PYTHON ?= python
 
-.PHONY: clean clean-pyc clean-patchfiles clean-backupfiles \
-        clean-generated clean-pylint pylint pylint-report test build develop
+# sphinx-apidoc settings
+DOC_OUTPUT_DIR=doc/
+DOC_OPTIONS=-f -F -H 'liblarch' -A 'Lionel Dricot & Izidor Matusov'
+
+
+.PHONY: clean clean-pyc clean-patchfiles clean-backupfiles doc doc-html \
+        clean-generated clean-pylint pylint pylint-report test build develop \
+        gen-doc clean-doc
 
 test:
 	./run-tests
@@ -42,11 +49,19 @@ pylint-report:
 build:
 	@$(PYTHON) setup.py build
 
+doc: gen-doc doc-html
+
+gen-doc:
+	sphinx-apidoc $(DOC_OPTIONS) -o $(DOC_OUTPUT_DIR) liblarch/
+
+doc-html:
+	$(MAKE) clean html -C $(DOC_OUTPUT_DIR)
+
 develop:
 	@$(PYTHON) setup.py develop
 
 clean: clean-pyc clean-patchfiles clean-backupfiles clean-generated clean-dist \
-       clean-pylint
+       clean-doc clean-pylint
 
 # Remove .py[c,o] files
 clean-pyc:
@@ -63,6 +78,9 @@ clean-backupfiles:
 
 clean-dist:
 	-@rm -rf dist/
+
+clean-doc:
+	-@rm -rf $(DOC_OUTPUT_DIR)
 
 clean-pylint:
 	-@rm -f liblarch.html

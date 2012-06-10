@@ -46,7 +46,8 @@ def is_compatible(request):
     return major == current_ma and minor <= current_mi
     
 class TreeNode(_Node):
-    """ The public interface for TreeNode
+    """
+    The public interface for TreeNode
     """
     def __init__(self, node_id, parent=None):
         _Node.__init__(self,node_id,parent)
@@ -62,7 +63,9 @@ class Tree(object):
     """
 
     def __init__(self):
-        """ Creates MainTree which wraps and a main view without filters """
+        """
+        Creates MainTree which wraps and a main view without filters
+        """
         self.__tree = MainTree()
         self.__fbank = FiltersBank(self.__tree)
         self.__views = {}
@@ -73,8 +76,10 @@ class Tree(object):
 ##### HANDLE NODES ############################################################
 
     def get_node(self, node_id):
-        """ Returns the object of node.
-        If the node does not exists, a ValueError is raised. """
+        """
+        Returns the object of node.
+        If the node does not exists, a ValueError is raised.
+        """
         return self.__tree.get_node(node_id)
 
     def has_node(self, node_id):
@@ -82,25 +87,35 @@ class Tree(object):
         return self.__tree.has_node(node_id)
 
     def add_node(self, node, parent_id=None, priority="low"):
-        """ Add a node to tree. If parent_id is set, put the node as a child of
-        this node, otherwise put it as a child of the root node."""
+        """
+        Add a node to tree. If parent_id is set, put the node as a child of
+        this node, otherwise put it as a child of the root node.
+        """
         self.__tree.add_node(node, parent_id, priority)
 
     def del_node(self, node_id, recursive=False):
-        """ Remove node from tree and return whether it was successful or not """
+        """
+        Remove node from tree and return whether it was successful or not.
+        """
         return self.__tree.remove_node(node_id, recursive)
 
     def refresh_node(self, node_id, priority="low"):
-        """ Send a request for updating the node """
+        """
+        Send a request for updating the node
+        """
         self.__tree.modify_node(node_id, priority)
 
     def refresh_all(self):
-        """ Refresh all nodes """
+        """
+        Refresh all nodes
+        """
         self.__tree.refresh_all()
 
     def move_node(self, node_id, new_parent_id=None):
-        """ Move the node to a new parent (dismissing all other parents)
-        use pid None to move it to the root """
+        """
+        Move the node to a new parent (dismissing all other parents)
+        use pid None to move it to the root
+        """
         if self.has_node(node_id):
             node = self.get_node(node_id)
             node.set_parent(new_parent_id)
@@ -112,8 +127,12 @@ class Tree(object):
 
 
     def add_parent(self, node_id, new_parent_id=None):
-        """ Add the node to a new parent. Return whether operation was
-        successful or not. If the node does not exists, return False """
+        """
+        Add the node to a new parent.
+
+        Return whether operation was successful or not. If the node does not
+        exists, return False
+        """
 
         if self.has_node(node_id):
             node = self.get_node(node_id)
@@ -123,19 +142,25 @@ class Tree(object):
 
 ##### VIEWS ###################################################################
     def get_main_view(self):
-        """ Return the special view "main" which is without any filters on it."""
+        """
+        Return the special view "main" which is without any filters on it.
+        """
         return self.__views['main']
 
     def get_viewtree(self, name=None, refresh=True):
-        """ Returns a viewtree by the name:
-          * a viewtree with that name exists => return it
-          * a viewtree with that name does not exist => create a new one and return it
-          * name is None => create an anonymous tree (do not remember it)
-
-        If refresh is False, the view is not initialized. This is useful as
-        an optimization if you plan to apply a filter.
         """
+        :refresh: When False the view is not initialized.
+                  This is useful as an optimization if you plan to apply a
+                  filter.
 
+        :returns: a viewtree by the name:
+
+                  - a viewtree with that name exists => return it
+                  - a viewtree with that name does not exist => create a new
+                    one and return it
+                  - name is None => create an anonymous tree
+                    (do not remember it)
+        """
         if name is not None and self.__views.has_key(name):
             view_tree = self.__views[name]
         else:
@@ -152,11 +177,12 @@ class Tree(object):
     def add_filter(self, filter_name, filter_func, parameters=None):
         """ Adds a filter to the filter bank.
 
-        @filter_name : name to give to the filter
-        @filter_func : the function that will filter the nodes
-        @parameters : some default parameters fot that filter
-        Return True if the filter was added
-        Return False if the filter_name was already in the bank
+        :filter_name: name to give to the filter
+        :filter_func: the function that will filter the nodes
+        :parameters: some default parameters fot that filter
+
+        :returns: - True if the filter was added
+                  - False if the *filter_name* was already in the bank
         """
         return self.__fbank.add_filter(filter_name, filter_func, parameters)
 

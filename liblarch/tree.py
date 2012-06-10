@@ -392,11 +392,12 @@ class MainTree(object):
         return self.nodes.keys()
 
     def next_node(self, node_id, parent_id=None):
-        """ Return the next sibling node or None if there is none
-
-        @param  node_id - we look for siblings of this node
-        @param parent_id - specify which siblings should be used, 
-            if task has more parents. If None, random parent will be used
+        """
+        :node_id: we look for siblings of this node
+        :parent_id: specify which siblings should be used,
+                    if task has more parents. If None, random parent
+                    will be used
+        :returns: the next sibling node or None if there is none
         """
         if node_id is None:
             raise ValueError('node_id should be different than None')
