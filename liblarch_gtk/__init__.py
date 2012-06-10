@@ -145,7 +145,7 @@ class TreeView(Gtk.TreeView):
 
             # Allow to set background color
             col.set_cell_data_func(renderer, self._celldatafunction)
-            
+
             if newcol:
                 self.append_column(col)
             self.columns[col_name] = (col_num, col)
@@ -163,7 +163,7 @@ class TreeView(Gtk.TreeView):
         self.basetree = tree
         # Build the model around LibLarch tree
         self.basetreemodel = TreeModel(tree, types)
-        #Applying an intermediate treemodelfilter, for debugging purpose
+        # Applying an intermediate treemodelfilter, for debugging purpose
         if USE_TREEMODELFILTER:
             treemodelfilter = self.basetreemodel.filter_new()
         else:
@@ -226,28 +226,31 @@ class TreeView(Gtk.TreeView):
         
         This method is needed for "rember collapsed nodes" feature of GTG.
         Transform node_id into paths and those paths collapse. By default all
-        children are expanded (see self.expand_all())"""
+        children are expanded (see self.expand_all())
+        
+        @parameter llpath - LibLarch path to the node. Node_id is extracted
+            as the last parameter and then all instances of that node are
+            collapsed. For retro-compatibility, we take llpath instead of
+            node_id directly
+        """
         node_id = llpath[-1].strip("'")
         if not node_id:
-            raise Exception('pas de node_id pour %s' %str(llpath))
-        if not self.basetree.is_displayed(node_id):
-            self.basetree.queue_action(node_id,self.collapse_node,param=llpath)
-        else:
-            iter = self.basetreemodel.my_get_iter(llpath)
-            if iter:
-                target_path = self.basetreemodel.get_path(iter)
-                if self.basetreemodel.get_value(iter,0) == node_id:
-                    self.collapse_row(target_path)
-                    self.collapsed_paths.append(llpath)
-                    it = self.basetreemodel.get_iter(target_path)
-                    newid = self.basetreemodel.get_value(it,0)
-                else:
-                    self.basetree.queue_action(node_id,self.collapse_node,param=llpath)
-            else:
-                #if we don't have iter, it is probably because the TreeModel
-                #is not loaded yet. Let just wait one more time
-                self.basetree.queue_action(node_id,self.collapse_node,param=llpath)
-                        
+            raise Exception('Missing node_id in path {0!s}'.format(llpath))
+
+        schedule_next = True
+        for path in self.basetree.get_paths_for_node(node_id):
+            iter = self.basetreemodel.my_get_iter(path)
+            if iter is None:
+                continue
+
+            target_path = self.basetreemodel.get_path(iter)
+            if self.basetreemodel.get_value(iter, 0) == node_id:
+                self.collapse_row(target_path)
+                self.collapsed_paths.append(path)
+                schedule_next = False
+
+        if schedule_next:
+            self.basetree.queue_action(node_id, self.collapse_node, param=llpath)
 
     def show(self):
         """ Shows the TreeView and connect basetreemodel to LibLarch """
@@ -294,10 +297,12 @@ class TreeView(Gtk.TreeView):
         """
 
         def closure_default_color(func, column):
-            """ Set default color to the function.
+            """
+            Set default color to the function.
 
             Transform function from func(node, default_color) into func(node).
-            Default color is computed based on some GTK style magic. """
+            Default color is computed based on some GTK style magic.
+            """
             default = column.get_tree_view().get_style().base[Gtk.StateType.NORMAL]
             return lambda node: func(node, default)
             
@@ -306,8 +311,9 @@ class TreeView(Gtk.TreeView):
             func = closure_default_color(color_func, column)
             self.treemodel.set_column_function(self.bg_color_column, func)
         else:
-            raise ValueError("There is no colum %s to use to set color" % \
-                color_column)
+            raise ValueError(
+                "There is no colum {0} to use to set color".format(color_column)
+            )
 
     def _sort_func(self, model, iter1, iter2, func=None):
         """ Sort two iterators by function which gets node objects.
@@ -325,9 +331,10 @@ class TreeView(Gtk.TreeView):
             sort = -1
         return sort
 
-    def _celldatafunction(self, column, cell, model, myiter):
-        """ Determine background color for cell
-        
+    def _celldatafunction(self, column, cell, model, myiter, user_data):
+        """
+        Determine background color for cell
+
         Requirements: self.bg_color_column must be set
         (see self.set_bg_color())
 
@@ -347,7 +354,7 @@ class TreeView(Gtk.TreeView):
             else:
                 fg_color = '#000000'
             cell.set_property("foreground", fg_color)
-       
+
         cell.set_property("cell-background", color)
 
     ######### DRAG-N-DROP functions #####################################
@@ -409,10 +416,12 @@ class TreeView(Gtk.TreeView):
         )
 
     def on_drag_data_get(self, treeview, context, selection, info, timestamp):
-        """ Extract data from the source of the DnD operation.
+        """
+        Extract data from the source of the DnD operation.
 
         Serialize iterators of selected tasks in format 
-        <iter>,<iter>,...,<iter> and set it as parameter of DND """
+        <iter>,<iter>,...,<iter> and set it as parameter of DND
+        """
 
         treeselection = treeview.get_selection()
         model, paths = treeselection.get_selected_rows()
@@ -503,16 +512,18 @@ class TreeView(Gtk.TreeView):
                     try:
                         tree.move_node(dragged_tid, new_parent_id=destination_tid)
                     except Exception, e:
-                        print 'Problem with dragging: %s' % e
-            elif info in self.dnd_external_targets and destination_tid:    
-                source = src_model.get_value(dragged_iter,0)
+                        print 'Problem with dragging: {0}'.format(e)
+            elif info in self.dnd_external_targets and destination_tid:
+                source = src_model.get_value(dragged_iter, 0)
                 # Handle external Drag'n'Drop
                 f(source, destination_tid)
 
 
     ######### Separators support ##############################################
     def _separator_func(self, model, itera, user_data=None):
-        """ Call user function to determine if this node is separator """
+        """
+        Call user function to determine if this node is separator
+        """
         if itera and model.iter_is_valid(itera):
             node_id = model.get_value(itera, 0)
             node = self.basetree.get_node(node_id)
