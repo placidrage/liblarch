@@ -1,0 +1,865 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liblarch Package &mdash; liblarch 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="top" title="liblarch 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to liblarch’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to liblarch’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">liblarch 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="liblarch-package">
+<h1>liblarch Package<a class="headerlink" href="#liblarch-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">liblarch</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-liblarch.__init__"></span><dl class="class">
+<dt id="liblarch.__init__.Tree">
+<em class="property">class </em><tt class="descclassname">liblarch.__init__.</tt><tt class="descname">Tree</tt><a class="reference internal" href="_modules/liblarch/__init__.html#Tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A thin wrapper to MainTree that adds filtering capabilities.
+It also provides a few methods to operate complex operation on the
+MainTree (e.g, move_node)</p>
+<dl class="method">
+<dt id="liblarch.__init__.Tree.add_filter">
+<tt class="descname">add_filter</tt><big>(</big><em>filter_name</em>, <em>filter_func</em>, <em>parameters=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.add_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.add_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a filter to the filter bank.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Filter_name :</th><td class="field-body">name to give to the filter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Filter_func :</th><td class="field-body">the function that will filter the nodes</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body">some default parameters fot that filter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li>True if the filter was added</li>
+<li>False if the <em>filter_name</em> was already in the bank</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.add_node">
+<tt class="descname">add_node</tt><big>(</big><em>node</em>, <em>parent_id=None</em>, <em>priority='low'</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a node to tree. If parent_id is set, put the node as a child of
+this node, otherwise put it as a child of the root node.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.add_parent">
+<tt class="descname">add_parent</tt><big>(</big><em>node_id</em>, <em>new_parent_id=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.add_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.add_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the node to a new parent.</p>
+<p>Return whether operation was successful or not. If the node does not
+exists, return False</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.del_node">
+<tt class="descname">del_node</tt><big>(</big><em>node_id</em>, <em>recursive=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.del_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.del_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove node from tree and return whether it was successful or not.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.get_main_view">
+<tt class="descname">get_main_view</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.get_main_view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.get_main_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the special view &#8220;main&#8221; which is without any filters on it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.get_node">
+<tt class="descname">get_node</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.get_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.get_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the object of node.
+If the node does not exists, a ValueError is raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.get_viewtree">
+<tt class="descname">get_viewtree</tt><big>(</big><em>name=None</em>, <em>refresh=True</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.get_viewtree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.get_viewtree" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Refresh :</th><td class="field-body">When False the view is not initialized.
+This is useful as an optimization if you plan to apply a
+filter.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a viewtree by the name:<ul class="simple">
+<li>a viewtree with that name exists =&gt; return it</li>
+<li>a viewtree with that name does not exist =&gt; create a new
+one and return it</li>
+<li>name is None =&gt; create an anonymous tree
+(do not remember it)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.has_node">
+<tt class="descname">has_node</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.has_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.has_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the node exists in this tree?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.list_filters">
+<tt class="descname">list_filters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.list_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.list_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all available filters by name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.move_node">
+<tt class="descname">move_node</tt><big>(</big><em>node_id</em>, <em>new_parent_id=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.move_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.move_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the node to a new parent (dismissing all other parents)
+use pid None to move it to the root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.refresh_all">
+<tt class="descname">refresh_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.refresh_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.refresh_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refresh all nodes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.refresh_node">
+<tt class="descname">refresh_node</tt><big>(</big><em>node_id</em>, <em>priority='low'</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.refresh_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.refresh_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a request for updating the node</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.Tree.remove_filter">
+<tt class="descname">remove_filter</tt><big>(</big><em>filter_name</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#Tree.remove_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.Tree.remove_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a filter from the bank. Only custom filters that were 
+added here can be removed. Return False if the filter was not removed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="liblarch.__init__.TreeNode">
+<em class="property">class </em><tt class="descclassname">liblarch.__init__.</tt><tt class="descname">TreeNode</tt><big>(</big><em>node_id</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#TreeNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.TreeNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">liblarch.treenode._Node</span></tt></p>
+<p>The public interface for TreeNode</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="liblarch.__init__.ViewTree">
+<em class="property">class </em><tt class="descclassname">liblarch.__init__.</tt><tt class="descname">ViewTree</tt><big>(</big><em>maininterface</em>, <em>maintree</em>, <em>filters_bank</em>, <em>name=None</em>, <em>refresh=True</em>, <em>static=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.apply_filter">
+<tt class="descname">apply_filter</tt><big>(</big><em>filter_name</em>, <em>parameters=None</em>, <em>reset=False</em>, <em>refresh=True</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.apply_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.apply_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a new filter to the tree.</p>
+<p>&#64;param filter_name: The name of an already registered filter to apply
+&#64;param parameters: Optional parameters to pass to the filter
+&#64;param reset&nbsp;: optional boolean. Should we remove other filters?
+&#64;param refresh : should we refresh after applying this filter ?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.deregister_cllbck">
+<tt class="descname">deregister_cllbck</tt><big>(</big><em>event</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.deregister_cllbck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.deregister_cllbck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the callback identifed by key (from register_cllbck)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_all_nodes">
+<tt class="descname">get_all_nodes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_all_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_all_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of node_id of displayed nodes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_basetree">
+<tt class="descname">get_basetree</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_basetree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_basetree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return Tree object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_current_state">
+<tt class="descname">get_current_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_current_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_current_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request current state to be send by signals/callbacks.</p>
+<p>This allow LibLarch widget to connect on fly (e.g. after FilteredTree
+is up and has some nodes).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_n_nodes">
+<tt class="descname">get_n_nodes</tt><big>(</big><em>withfilters=</em><span class="optional">[</span><span class="optional">]</span>, <em>include_transparent=True</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_n_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_n_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns quantity of displayed nodes in this tree</p>
+<p>&#64;withfilters =&gt; Additional filters are applied before counting,
+i.e. the currently applied filters are also taken into account</p>
+<p>&#64;inclde_transparent =&gt; if it is False, filters which don&#8217;t have
+the transparent parameters are skipped, not takend into account</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_node">
+<tt class="descname">get_node</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a node from MainTree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_node_for_path">
+<tt class="descname">get_node_for_path</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_node_for_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_node_for_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert path to node_id.</p>
+<p>I am not sure what this is for...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_paths_for_node">
+<tt class="descname">get_paths_for_node</tt><big>(</big><em>node_id=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_paths_for_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_paths_for_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>If node_id is none, return root path</p>
+<p><em>Almost</em> reverse function to get_node_for_path
+(1 node can have many paths, 1:M)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.get_root">
+<tt class="descname">get_root</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.get_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.get_root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.is_displayed">
+<tt class="descname">is_displayed</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.is_displayed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.is_displayed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the node displayed?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.list_applied_filters">
+<tt class="descname">list_applied_filters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.list_applied_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.list_applied_filters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.next_node">
+<tt class="descname">next_node</tt><big>(</big><em>node_id</em>, <em>pid=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.next_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.next_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next node to node_id.</p>
+<p>&#64;parent_id =&gt; identify which instance of node_id to work.
+If None, random instance is used</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.node_all_children">
+<tt class="descname">node_all_children</tt><big>(</big><em>node_id=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.node_all_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.node_all_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return children of a node</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.node_has_child">
+<tt class="descname">node_has_child</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.node_has_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.node_has_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>Has the node at least one child?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.node_has_parent">
+<tt class="descname">node_has_parent</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.node_has_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.node_has_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Has node parents? Is it child of root?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.node_n_children">
+<tt class="descname">node_n_children</tt><big>(</big><em>node_id=None</em>, <em>recursive=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.node_n_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.node_n_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return quantity of children of node_id.
+If node_id is None, use the root node. 
+Every instance of node has the same children</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.node_nth_child">
+<tt class="descname">node_nth_child</tt><big>(</big><em>node_id</em>, <em>n</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.node_nth_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.node_nth_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return nth child of the node.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.node_parents">
+<tt class="descname">node_parents</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.node_parents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.node_parents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns displayed parents of the given node, or [] if there is no 
+parent (such as if the node is a child of the virtual root),
+or if the parent is not displayable.
+Doesn&#8217;t check wheter node node_id is displayed or not. (we only care about
+parents)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.print_tree">
+<tt class="descname">print_tree</tt><big>(</big><em>string=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.print_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.print_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the shown tree, i.e. MainTree or FilteredTree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.queue_action">
+<tt class="descname">queue_action</tt><big>(</big><em>node_id</em>, <em>func</em>, <em>param=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.queue_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.queue_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.refresh_all">
+<tt class="descname">refresh_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.refresh_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.refresh_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.register_cllbck">
+<tt class="descname">register_cllbck</tt><big>(</big><em>event</em>, <em>func</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.register_cllbck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.register_cllbck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store function and return unique key which can be used to
+unregister the callback later</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.reset_filters">
+<tt class="descname">reset_filters</tt><big>(</big><em>refresh=True</em>, <em>transparent_only=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.reset_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.reset_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all filters currently set on the tree.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.__init__.ViewTree.unapply_filter">
+<tt class="descname">unapply_filter</tt><big>(</big><em>filter_name</em>, <em>refresh=True</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#ViewTree.unapply_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.ViewTree.unapply_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a filter from the tree.</p>
+<p>&#64;param filter_name: The name of filter to remove</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="liblarch.__init__.is_compatible">
+<tt class="descclassname">liblarch.__init__.</tt><tt class="descname">is_compatible</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/liblarch/__init__.html#is_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.__init__.is_compatible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-liblarch.filteredtree">
+<span id="filteredtree-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">filteredtree</span></tt> Module<a class="headerlink" href="#module-liblarch.filteredtree" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="liblarch.filteredtree.FilteredTree">
+<em class="property">class </em><tt class="descclassname">liblarch.filteredtree.</tt><tt class="descname">FilteredTree</tt><big>(</big><em>tree</em>, <em>filtersbank</em>, <em>name=None</em>, <em>refresh=True</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>FilteredTree is the most important and also the most buggy part of
+LibLarch.</p>
+<p>FilteredTree transforms general changes in tree like creating/removing 
+relationships between nodes and adding/updating/removing nodes into a serie
+of simple steps which can be for instance by GTK Widget.</p>
+<p>FilteredTree allows filtering - hiding certain nodes defined by a predicate.</p>
+<p>The reason of most bugs is that FilteredTree is request to update a node.
+FilteredTree must update its ancestors and also decestors. You cann&#8217;t do that
+by a simple recursion.</p>
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.apply_filter">
+<tt class="descname">apply_filter</tt><big>(</big><em>filter_name</em>, <em>parameters=None</em>, <em>reset=None</em>, <em>refresh=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.apply_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.apply_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a new filter to the tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Filter_name :</th><td class="field-body">The name of an registrered filter from filters_bank</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters :</th><td class="field-body">Optional parameters to pass to the filter</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Reset :</th><td class="field-body">Should other filters be removed?</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Refresh :</th><td class="field-body">Should be refereshed the whole tree?
+(performance optimization)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.callback">
+<tt class="descname">callback</tt><big>(</big><em>event</em>, <em>node_id</em>, <em>path</em>, <em>neworder=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a callback.</p>
+<p>To call callback, the object must be initialized and function exists.</p>
+<p>&#64;param event: one of added, modified, deleted, reordered, runonce
+&#64;param node_id: node_id parameter for callback function
+&#64;param path: path parameter for callback function
+&#64;param neworder: neworder parameter for reorder callback function</p>
+<p>The runonce event is actually only run once, when a given task appears.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.get_all_nodes">
+<tt class="descname">get_all_nodes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.get_all_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.get_all_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.get_current_state">
+<tt class="descname">get_current_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.get_current_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.get_current_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows to connect LibLarch widget on fly to FilteredTree</p>
+<p>Sends &#8216;added&#8217; signal/callback for every nodes that is currently
+in FilteredTree. After that, FilteredTree and TreeModel are
+in the same state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.get_n_nodes">
+<tt class="descname">get_n_nodes</tt><big>(</big><em>withfilters=</em><span class="optional">[</span><span class="optional">]</span>, <em>include_transparent=True</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.get_n_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.get_n_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns quantity of displayed nodes in this tree
+if the withfilters is set, returns the quantity of nodes
+that will be displayed if we apply those filters to the current
+tree. It means that the currently applied filters are also taken into
+account.
+If include_transparent=False, we only take into account the applied filters
+that doesn&#8217;t have the transparent parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.get_node_for_path">
+<tt class="descname">get_node_for_path</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.get_node_for_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.get_node_for_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.get_paths_for_node">
+<tt class="descname">get_paths_for_node</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.get_paths_for_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.get_paths_for_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.is_displayed">
+<tt class="descname">is_displayed</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.is_displayed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.is_displayed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the node displayed at the moment?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.is_path_valid">
+<tt class="descname">is_path_valid</tt><big>(</big><em>p</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.is_path_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.is_path_valid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.list_applied_filters">
+<tt class="descname">list_applied_filters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.list_applied_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.list_applied_filters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.next_node">
+<tt class="descname">next_node</tt><big>(</big><em>node_id</em>, <em>parent_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.next_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.next_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.node_all_children">
+<tt class="descname">node_all_children</tt><big>(</big><em>node_id=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.node_all_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.node_all_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.node_has_child">
+<tt class="descname">node_has_child</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.node_has_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.node_has_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.node_n_children">
+<tt class="descname">node_n_children</tt><big>(</big><em>node_id</em>, <em>recursive=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.node_n_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.node_n_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.node_nth_child">
+<tt class="descname">node_nth_child</tt><big>(</big><em>node_id</em>, <em>n</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.node_nth_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.node_nth_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.node_parents">
+<tt class="descname">node_parents</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.node_parents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.node_parents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.print_tree">
+<tt class="descname">print_tree</tt><big>(</big><em>string=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.print_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.print_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation of tree in FilteredTree</p>
+<p>&#64;param string: if set, instead of printing, return string for printing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.refilter">
+<tt class="descname">refilter</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.refilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.refilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.reset_filters">
+<tt class="descname">reset_filters</tt><big>(</big><em>refresh=True</em>, <em>transparent_only=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.reset_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.reset_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears all filters currently set on the tree.  Can&#8217;t be called on 
+the main tree.
+Remove only transparents filters if transparent_only is True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.send_add_tree">
+<tt class="descname">send_add_tree</tt><big>(</big><em>node_id</em>, <em>parent_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.send_add_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.send_add_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.send_remove_tree">
+<tt class="descname">send_remove_tree</tt><big>(</big><em>node_id</em>, <em>parent_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.send_remove_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.send_remove_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.set_callback">
+<tt class="descname">set_callback</tt><big>(</big><em>event</em>, <em>func</em>, <em>node_id=None</em>, <em>param=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.set_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.set_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a callback for an event.</p>
+<p>It is possible to have just one callback for event.
+&#64;param event: one of added, modified, deleted, reordered
+&#64;param func: callback function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.test_validity">
+<tt class="descname">test_validity</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.test_validity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.test_validity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filteredtree.FilteredTree.unapply_filter">
+<tt class="descname">unapply_filter</tt><big>(</big><em>filter_name</em>, <em>refresh=True</em><big>)</big><a class="reference internal" href="_modules/liblarch/filteredtree.html#FilteredTree.unapply_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filteredtree.FilteredTree.unapply_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a filter from the tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Filter_name :</th><td class="field-body">The name of an already added filter to remove</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Refresh :</th><td class="field-body">Should be refereshed the whole tree?
+(performance optimization)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-liblarch.filters_bank">
+<span id="filters-bank-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">filters_bank</span></tt> Module<a class="headerlink" href="#module-liblarch.filters_bank" title="Permalink to this headline">¶</a></h2>
+<p>filters_bank stores all of GTG&#8217;s filters in centralized place</p>
+<dl class="class">
+<dt id="liblarch.filters_bank.Filter">
+<em class="property">class </em><tt class="descclassname">liblarch.filters_bank.</tt><tt class="descname">Filter</tt><big>(</big><em>func</em>, <em>req</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#Filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.Filter" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="liblarch.filters_bank.Filter.get_parameters">
+<tt class="descname">get_parameters</tt><big>(</big><em>param</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#Filter.get_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.Filter.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filters_bank.Filter.is_displayed">
+<tt class="descname">is_displayed</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#Filter.is_displayed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.Filter.is_displayed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filters_bank.Filter.is_flat">
+<tt class="descname">is_flat</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#Filter.is_flat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.Filter.is_flat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should be the final list flat</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filters_bank.Filter.is_transparent">
+<tt class="descname">is_transparent</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#Filter.is_transparent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.Filter.is_transparent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this filter transparent?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filters_bank.Filter.set_parameters">
+<tt class="descname">set_parameters</tt><big>(</big><em>dic</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#Filter.set_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.Filter.set_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="liblarch.filters_bank.FiltersBank">
+<em class="property">class </em><tt class="descclassname">liblarch.filters_bank.</tt><tt class="descname">FiltersBank</tt><big>(</big><em>tree</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#FiltersBank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.FiltersBank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores filter objects in a centralized place.</p>
+<dl class="method">
+<dt id="liblarch.filters_bank.FiltersBank.add_filter">
+<tt class="descname">add_filter</tt><big>(</big><em>filter_name</em>, <em>filter_func</em>, <em>parameters=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#FiltersBank.add_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.FiltersBank.add_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a filter to the filter bank 
+Return True if the filter was added
+Return False if the filter_name was already in the bank</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filters_bank.FiltersBank.get_filter">
+<tt class="descname">get_filter</tt><big>(</big><em>filter_name</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#FiltersBank.get_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.FiltersBank.get_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the filter object for a given name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filters_bank.FiltersBank.list_filters">
+<tt class="descname">list_filters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#FiltersBank.list_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.FiltersBank.list_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>List, by name, all available filters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.filters_bank.FiltersBank.remove_filter">
+<tt class="descname">remove_filter</tt><big>(</big><em>filter_name</em><big>)</big><a class="reference internal" href="_modules/liblarch/filters_bank.html#FiltersBank.remove_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.filters_bank.FiltersBank.remove_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a filter from the bank.
+Only custom filters that were added here can be removed
+Return False if the filter was not removed</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-liblarch.processqueue">
+<span id="processqueue-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">processqueue</span></tt> Module<a class="headerlink" href="#module-liblarch.processqueue" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="liblarch.processqueue.SyncQueue">
+<em class="property">class </em><tt class="descclassname">liblarch.processqueue.</tt><tt class="descname">SyncQueue</tt><a class="reference internal" href="_modules/liblarch/processqueue.html#SyncQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.processqueue.SyncQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Synchronized queue for processing requests</p>
+<dl class="method">
+<dt id="liblarch.processqueue.SyncQueue.process">
+<tt class="descname">process</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/processqueue.html#SyncQueue.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.processqueue.SyncQueue.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return elements to process</p>
+<p>At the moment, it returns just one element. In the future more
+elements may be better to return (to speed it up).</p>
+<p>If there is no request left, disable processing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.processqueue.SyncQueue.process_queue">
+<tt class="descname">process_queue</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/processqueue.html#SyncQueue.process_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.processqueue.SyncQueue.process_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process requests from queue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.processqueue.SyncQueue.push">
+<tt class="descname">push</tt><big>(</big><em>*element</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/liblarch/processqueue.html#SyncQueue.push"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.processqueue.SyncQueue.push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new element to the queue.</p>
+<p>Process actions from the same thread as the thread which created
+this queue immediately. What does it mean? When I use liblarch
+without threads, all actions are processed immediately. In GTG,
+this queue is created by the main thread which process GUI. When
+GUI callback is triggered, process those actions immediately because
+no protection is needed. However, requests from synchronization
+services are put in the queue.</p>
+<p>Application can choose which kind of priority should have an update.
+If the request is not in the queue of selected priority, add it and
+setup callback.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-liblarch.tree">
+<span id="tree-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">tree</span></tt> Module<a class="headerlink" href="#module-liblarch.tree" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="liblarch.tree.MainTree">
+<em class="property">class </em><tt class="descclassname">liblarch.tree.</tt><tt class="descname">MainTree</tt><a class="reference internal" href="_modules/liblarch/tree.html#MainTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Tree which stores and handle all requests</p>
+<dl class="method">
+<dt id="liblarch.tree.MainTree.add_node">
+<tt class="descname">add_node</tt><big>(</big><em>node</em>, <em>parent_id=None</em>, <em>priority='low'</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.add_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.break_relationship">
+<tt class="descname">break_relationship</tt><big>(</big><em>parent_id</em>, <em>child_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.break_relationship"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.break_relationship" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.deregister_callback">
+<tt class="descname">deregister_callback</tt><big>(</big><em>event</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.deregister_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.deregister_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the callback identifed by key (from register_cllbck)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.get_all_nodes">
+<tt class="descname">get_all_nodes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.get_all_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.get_all_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of all nodes in this tree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.get_node">
+<tt class="descname">get_node</tt><big>(</big><em>node_id=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.get_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.get_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return node of tree or root node of this tree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.get_node_for_path">
+<tt class="descname">get_node_for_path</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.get_node_for_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.get_node_for_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert path into node_id</p>
+<p>&#64;return node_id if path is valid, None otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.get_paths_for_node">
+<tt class="descname">get_paths_for_node</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.get_paths_for_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.get_paths_for_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all paths for node_id</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.get_root">
+<tt class="descname">get_root</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.get_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.get_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return root node</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.has_node">
+<tt class="descname">has_node</tt><big>(</big><em>node_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.has_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.has_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this node_id in this tree?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.modify_node">
+<tt class="descname">modify_node</tt><big>(</big><em>node_id</em>, <em>priority='low'</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.modify_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.modify_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.new_relationship">
+<tt class="descname">new_relationship</tt><big>(</big><em>parent_id</em>, <em>child_id</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.new_relationship"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.new_relationship" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.next_node">
+<tt class="descname">next_node</tt><big>(</big><em>node_id</em>, <em>parent_id=None</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.next_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.next_node" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Node_id :</th><td class="field-body">we look for siblings of this node</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parent_id :</th><td class="field-body">specify which siblings should be used,
+if task has more parents. If None, random parent
+will be used</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the next sibling node or None if there is none</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.print_tree">
+<tt class="descname">print_tree</tt><big>(</big><em>string=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.print_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.print_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.refresh_all">
+<tt class="descname">refresh_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.refresh_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.refresh_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refresh all nodes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.register_callback">
+<tt class="descname">register_callback</tt><big>(</big><em>event</em>, <em>func</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.register_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.register_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store function and return unique key which can be used to
+unregister the callback later</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch.tree.MainTree.remove_node">
+<tt class="descname">remove_node</tt><big>(</big><em>node_id</em>, <em>recursive=False</em><big>)</big><a class="reference internal" href="_modules/liblarch/tree.html#MainTree.remove_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch.tree.MainTree.remove_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-liblarch.treenode">
+<span id="treenode-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">treenode</span></tt> Module<a class="headerlink" href="#module-liblarch.treenode" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">liblarch Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">liblarch</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-liblarch.filteredtree"><tt class="docutils literal"><span class="pre">filteredtree</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-liblarch.filters_bank"><tt class="docutils literal"><span class="pre">filters_bank</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-liblarch.processqueue"><tt class="docutils literal"><span class="pre">processqueue</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-liblarch.tree"><tt class="docutils literal"><span class="pre">tree</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-liblarch.treenode"><tt class="docutils literal"><span class="pre">treenode</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to liblarch&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/liblarch.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to liblarch’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">liblarch 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Lionel Dricot &amp; Izidor Matušov.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

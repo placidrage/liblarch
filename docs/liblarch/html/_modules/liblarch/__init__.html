@@ -1,0 +1,580 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liblarch.__init__ &mdash; liblarch 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    <link rel="top" title="liblarch 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for liblarch.__init__</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+<span class="c"># Liblarch - a library to handle directed acyclic graphs</span>
+<span class="c"># Copyright (c) 2011-2012 - Lionel Dricot &amp; Izidor Matušov</span>
+<span class="c">#</span>
+<span class="c"># This program is free software: you can redistribute it and/or modify it under</span>
+<span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+<span class="c"># Software Foundation, either version 3 of the License, or (at your option) any</span>
+<span class="c"># later version.</span>
+<span class="c">#</span>
+<span class="c"># This program is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="c"># FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more</span>
+<span class="c"># details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c"># along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">liblarch.tree</span> <span class="kn">import</span> <span class="n">MainTree</span>
+<span class="kn">from</span> <span class="nn">liblarch.treenode</span> <span class="kn">import</span> <span class="n">_Node</span>
+<span class="kn">from</span> <span class="nn">liblarch.filteredtree</span> <span class="kn">import</span> <span class="n">FilteredTree</span>
+<span class="kn">from</span> <span class="nn">liblarch.filters_bank</span> <span class="kn">import</span> <span class="n">FiltersBank</span>
+
+
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;0.2.3&#39;</span>
+
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<span class="c"># API version of liblarch. </span>
+<span class="c"># Your application is compatible if the major version number match liblarch&#39;s</span>
+<span class="c"># one and if your minor version number is inferior to liblarch&#39;s one.</span>
+<span class="c">#</span>
+<span class="c"># The major number is incremented if an existing method is removed or modified</span>
+<span class="c"># The minor number is incremented when a method is added to the API</span>
+<span class="n">API</span> <span class="o">=</span> <span class="s">&quot;1.1&quot;</span>
+
+
+<div class="viewcode-block" id="is_compatible"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.is_compatible">[docs]</a><span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">major</span><span class="p">,</span> <span class="n">minor</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)]</span>
+    <span class="n">current_ma</span><span class="p">,</span> <span class="n">current_mi</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">API</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">major</span> <span class="o">==</span> <span class="n">current_ma</span> <span class="ow">and</span> <span class="n">minor</span> <span class="o">&lt;=</span> <span class="n">current_mi</span>
+    </div>
+<div class="viewcode-block" id="TreeNode"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.TreeNode">[docs]</a><span class="k">class</span> <span class="nc">TreeNode</span><span class="p">(</span><span class="n">_Node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The public interface for TreeNode</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">_Node</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">node_id</span><span class="p">,</span><span class="n">parent</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_set_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;_set_tree is not part of the API&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Tree"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree">[docs]</a><span class="k">class</span> <span class="nc">Tree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A thin wrapper to MainTree that adds filtering capabilities.</span>
+<span class="sd">    It also provides a few methods to operate complex operation on the</span>
+<span class="sd">    MainTree (e.g, move_node)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates MainTree which wraps and a main view without filters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span> <span class="o">=</span> <span class="n">MainTree</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span> <span class="o">=</span> <span class="n">FiltersBank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__views</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__views</span><span class="p">[</span><span class="s">&#39;main&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ViewTree</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="bp">True</span>
+        <span class="p">)</span>
+
+<span class="c">##### HANDLE NODES ############################################################</span>
+
+<div class="viewcode-block" id="Tree.get_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.get_node">[docs]</a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the object of node.</span>
+<span class="sd">        If the node does not exists, a ValueError is raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Tree.has_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.has_node">[docs]</a>    <span class="k">def</span> <span class="nf">has_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Does the node exists in this tree? &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Tree.add_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">parent_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">&quot;low&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a node to tree. If parent_id is set, put the node as a child of</span>
+<span class="sd">        this node, otherwise put it as a child of the root node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">priority</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Tree.del_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.del_node">[docs]</a>    <span class="k">def</span> <span class="nf">del_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove node from tree and return whether it was successful or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">recursive</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Tree.refresh_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.refresh_node">[docs]</a>    <span class="k">def</span> <span class="nf">refresh_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="s">&quot;low&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a request for updating the node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">modify_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">priority</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Tree.refresh_all"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.refresh_all">[docs]</a>    <span class="k">def</span> <span class="nf">refresh_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Refresh all nodes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">refresh_all</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Tree.move_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.move_node">[docs]</a>    <span class="k">def</span> <span class="nf">move_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">new_parent_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Move the node to a new parent (dismissing all other parents)</span>
+<span class="sd">        use pid None to move it to the root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">new_parent_id</span><span class="p">)</span>
+            <span class="n">toreturn</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">toreturn</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">return</span> <span class="n">toreturn</span>
+
+</div>
+<div class="viewcode-block" id="Tree.add_parent"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.add_parent">[docs]</a>    <span class="k">def</span> <span class="nf">add_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">new_parent_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add the node to a new parent.</span>
+
+<span class="sd">        Return whether operation was successful or not. If the node does not</span>
+<span class="sd">        exists, return False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">add_parent</span><span class="p">(</span><span class="n">new_parent_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+<span class="c">##### VIEWS ###################################################################</span></div>
+<div class="viewcode-block" id="Tree.get_main_view"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.get_main_view">[docs]</a>    <span class="k">def</span> <span class="nf">get_main_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the special view &quot;main&quot; which is without any filters on it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__views</span><span class="p">[</span><span class="s">&#39;main&#39;</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Tree.get_viewtree"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.get_viewtree">[docs]</a>    <span class="k">def</span> <span class="nf">get_viewtree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :refresh: When False the view is not initialized.</span>
+<span class="sd">                  This is useful as an optimization if you plan to apply a</span>
+<span class="sd">                  filter.</span>
+
+<span class="sd">        :returns: a viewtree by the name:</span>
+
+<span class="sd">                  - a viewtree with that name exists =&gt; return it</span>
+<span class="sd">                  - a viewtree with that name does not exist =&gt; create a new</span>
+<span class="sd">                    one and return it</span>
+<span class="sd">                  - name is None =&gt; create an anonymous tree</span>
+<span class="sd">                    (do not remember it)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__views</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">view_tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__views</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">view_tree</span> <span class="o">=</span> <span class="n">ViewTree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="n">refresh</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__views</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">view_tree</span>
+        <span class="k">return</span> <span class="n">view_tree</span>
+
+<span class="c">##### FILTERS ##################################################################</span></div>
+<div class="viewcode-block" id="Tree.list_filters"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.list_filters">[docs]</a>    <span class="k">def</span> <span class="nf">list_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return a list of all available filters by name &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span><span class="o">.</span><span class="n">list_filters</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Tree.add_filter"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.add_filter">[docs]</a>    <span class="k">def</span> <span class="nf">add_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">,</span> <span class="n">filter_func</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Adds a filter to the filter bank.</span>
+
+<span class="sd">        :filter_name: name to give to the filter</span>
+<span class="sd">        :filter_func: the function that will filter the nodes</span>
+<span class="sd">        :parameters: some default parameters fot that filter</span>
+
+<span class="sd">        :returns: - True if the filter was added</span>
+<span class="sd">                  - False if the *filter_name* was already in the bank</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">,</span> <span class="n">filter_func</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Tree.remove_filter"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.Tree.remove_filter">[docs]</a>    <span class="k">def</span> <span class="nf">remove_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filter_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Remove a filter from the bank. Only custom filters that were </span>
+<span class="sd">        added here can be removed. Return False if the filter was not removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span><span class="o">.</span><span class="n">remove_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<span class="c"># There should be two classes: for static and for dynamic mode</span>
+<span class="c"># There are many conditions, and also we would prevent unallowed modes</span></div></div>
+<div class="viewcode-block" id="ViewTree"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree">[docs]</a><span class="k">class</span> <span class="nc">ViewTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">maininterface</span><span class="p">,</span> <span class="n">maintree</span><span class="p">,</span> <span class="n">filters_bank</span><span class="p">,</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A ViewTree is the interface that should be used to display Tree(s).</span>
+
+<span class="sd">           In static mode, FilteredTree layer is not created. (There is no need)</span>
+
+<span class="sd">           We connect to MainTree or FilteredTree to get informed about changes.</span>
+<span class="sd">           If FilteredTree is used, it is connected to MainTree to handle changes</span>
+<span class="sd">           and then send id to ViewTree if it applies.</span>
+
+<span class="sd">           :param maintree: a Tree object, cointaining all the nodes</span>
+<span class="sd">           :param filters_bank: a FiltersBank object. Filters can be added</span>
+<span class="sd">                                dinamically to that.</span>
+<span class="sd">           :param refresh: if True, this ViewTree is automatically refreshed</span>
+<span class="sd">                           after applying a filter.</span>
+<span class="sd">           :param static: if True, this is the view of the complete maintree.</span>
+<span class="sd">                           Filters cannot be added to such a view.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maininterface</span> <span class="o">=</span> <span class="n">maininterface</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span> <span class="o">=</span> <span class="n">maintree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cllbcks</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span> <span class="o">=</span> <span class="n">filters_bank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">static</span> <span class="o">=</span> <span class="n">static</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span><span class="s">&#39;node-added&#39;</span><span class="p">,</span> \
+                        <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;node-added&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span><span class="s">&#39;node-deleted&#39;</span><span class="p">,</span> \
+                        <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;node-deleted&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span><span class="s">&#39;node-modified&#39;</span><span class="p">,</span> \
+                        <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;node-modified&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span> <span class="o">=</span> <span class="n">FilteredTree</span><span class="p">(</span><span class="n">maintree</span><span class="p">,</span> <span class="n">filters_bank</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="n">refresh</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="s">&#39;added&#39;</span><span class="p">,</span> \
+                        <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;node-added-inview&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="s">&#39;deleted&#39;</span><span class="p">,</span> \
+                        <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;node-deleted-inview&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="s">&#39;modified&#39;</span><span class="p">,</span> \
+                        <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;node-modified-inview&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="s">&#39;reordered&#39;</span><span class="p">,</span> \
+                        <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;node-children-reordered&#39;</span><span class="p">))</span>
+                        
+<div class="viewcode-block" id="ViewTree.queue_action"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.queue_action">[docs]</a>    <span class="k">def</span> <span class="nf">queue_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span><span class="n">func</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="s">&#39;runonce&#39;</span><span class="p">,</span><span class="n">func</span><span class="p">,</span><span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="ViewTree.get_basetree"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_basetree">[docs]</a>    <span class="k">def</span> <span class="nf">get_basetree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return Tree object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">maininterface</span>
+</div>
+<div class="viewcode-block" id="ViewTree.register_cllbck"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.register_cllbck">[docs]</a>    <span class="k">def</span> <span class="nf">register_cllbck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store function and return unique key which can be used to</span>
+<span class="sd">        unregister the callback later</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cllbcks</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cllbcks</span><span class="p">[</span><span class="n">event</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cllbcks</span><span class="p">[</span><span class="n">event</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">callbacks</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="k">return</span> <span class="n">key</span>
+</div>
+<div class="viewcode-block" id="ViewTree.deregister_cllbck"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.deregister_cllbck">[docs]</a>    <span class="k">def</span> <span class="nf">deregister_cllbck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove the callback identifed by key (from register_cllbck)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cllbcks</span><span class="p">[</span><span class="n">event</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c"># callback non-existent</span>
+            <span class="k">pass</span>
+</div>
+    <span class="k">def</span> <span class="nf">__emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">neworder</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle a new event from MainTree or FilteredTree</span>
+<span class="sd">        by passing it to other objects, e.g. TreeWidget</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cllbcks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="p">{}))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;ViewTree __emit for {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">node_id</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;   -&gt; func = {0} - {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">neworder</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">neworder</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ViewTree.get_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_node">[docs]</a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a node from MainTree</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+    <span class="c">#FIXME Remove this method from public interface</span></div>
+<div class="viewcode-block" id="ViewTree.get_root"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_root">[docs]</a>    <span class="k">def</span> <span class="nf">get_root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">get_root</span><span class="p">()</span>
+
+    <span class="c">#FIXME Remove this method from public interface</span></div>
+<div class="viewcode-block" id="ViewTree.refresh_all"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.refresh_all">[docs]</a>    <span class="k">def</span> <span class="nf">refresh_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">refresh_all</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="ViewTree.get_current_state"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_current_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Request current state to be send by signals/callbacks.</span>
+
+<span class="sd">        This allow LibLarch widget to connect on fly (e.g. after FilteredTree</span>
+<span class="sd">        is up and has some nodes).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">refresh_all</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">get_current_state</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="ViewTree.print_tree"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.print_tree">[docs]</a>    <span class="k">def</span> <span class="nf">print_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the shown tree, i.e. MainTree or FilteredTree</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">print_tree</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.get_all_nodes"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_all_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of node_id of displayed nodes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">get_all_nodes</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="ViewTree.get_n_nodes"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_n_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">withfilters</span><span class="o">=</span><span class="p">[],</span> <span class="n">include_transparent</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns quantity of displayed nodes in this tree</span>
+
+<span class="sd">        @withfilters =&gt; Additional filters are applied before counting,</span>
+<span class="sd">        i.e. the currently applied filters are also taken into account</span>
+
+<span class="sd">        @inclde_transparent =&gt; if it is False, filters which don&#39;t have</span>
+<span class="sd">        the transparent parameters are skipped, not takend into account</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span> <span class="o">=</span> <span class="n">FilteredTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">get_n_nodes</span><span class="p">(</span><span class="n">withfilters</span><span class="o">=</span><span class="n">withfilters</span><span class="p">,</span>\
+                                    <span class="n">include_transparent</span><span class="o">=</span><span class="n">include_transparent</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.get_node_for_path"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_node_for_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_for_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert path to node_id.</span>
+
+<span class="sd">        I am not sure what this is for... &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">get_node_for_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.get_paths_for_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.get_paths_for_node">[docs]</a>    <span class="k">def</span> <span class="nf">get_paths_for_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; If node_id is none, return root path</span>
+
+<span class="sd">        *Almost* reverse function to get_node_for_path</span>
+<span class="sd">        (1 node can have many paths, 1:M)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+    <span class="c"># FIXME change pid =&gt; parent_id</span></div>
+<div class="viewcode-block" id="ViewTree.next_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.next_node">[docs]</a>    <span class="k">def</span> <span class="nf">next_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the next node to node_id.</span>
+
+<span class="sd">        @parent_id =&gt; identify which instance of node_id to work.</span>
+<span class="sd">        If None, random instance is used &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">next_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">pid</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="ViewTree.node_has_child"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.node_has_child">[docs]</a>    <span class="k">def</span> <span class="nf">node_has_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Has the node at least one child? &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span><span class="o">.</span><span class="n">has_child</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">node_has_child</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.node_all_children"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.node_all_children">[docs]</a>    <span class="k">def</span> <span class="nf">node_all_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return children of a node &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">node_id</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span><span class="o">.</span><span class="n">get_children</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">node_all_children</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.node_n_children"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.node_n_children">[docs]</a>    <span class="k">def</span> <span class="nf">node_n_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return quantity of children of node_id.</span>
+<span class="sd">        If node_id is None, use the root node. </span>
+<span class="sd">        Every instance of node has the same children&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span> <span class="o">=</span> <span class="n">FilteredTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fbank</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">node_n_children</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span><span class="n">recursive</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.node_nth_child"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.node_nth_child">[docs]</a>    <span class="k">def</span> <span class="nf">node_nth_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return nth child of the node. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">node_id</span> <span class="ow">or</span> <span class="n">node_id</span> <span class="o">==</span> <span class="s">&#39;root&#39;</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">get_root</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">node</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">get_n_children</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">get_nth_child</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s">&quot;node {0} has less than {1} nodes&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">realn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">node_n_children</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">realn</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s">&quot;viewtree has {0} nodes, no node {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">realn</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">node_nth_child</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="ViewTree.node_has_parent"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.node_has_parent">[docs]</a>    <span class="k">def</span> <span class="nf">node_has_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Has node parents? Is it child of root?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_parents</span><span class="p">(</span><span class="n">node_id</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="ViewTree.node_parents"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.node_parents">[docs]</a>    <span class="k">def</span> <span class="nf">node_parents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns displayed parents of the given node, or [] if there is no </span>
+<span class="sd">        parent (such as if the node is a child of the virtual root),</span>
+<span class="sd">        or if the parent is not displayable.</span>
+<span class="sd">        Doesn&#39;t check wheter node node_id is displayed or not. (we only care about</span>
+<span class="sd">        parents)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span><span class="o">.</span><span class="n">get_parents</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">node_parents</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.is_displayed"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.is_displayed">[docs]</a>    <span class="k">def</span> <span class="nf">is_displayed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Is the node displayed? &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maintree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+<span class="c">####### FILTERS ###############################################################</span></div>
+<div class="viewcode-block" id="ViewTree.list_applied_filters"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.list_applied_filters">[docs]</a>    <span class="k">def</span> <span class="nf">list_applied_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">list_applied_filters</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="ViewTree.apply_filter"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.apply_filter">[docs]</a>    <span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> \
+                     <span class="n">reset</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Applies a new filter to the tree.</span>
+
+<span class="sd">        @param filter_name: The name of an already registered filter to apply</span>
+<span class="sd">        @param parameters: Optional parameters to pass to the filter</span>
+<span class="sd">        @param reset : optional boolean. Should we remove other filters?</span>
+<span class="sd">        @param refresh : should we refresh after applying this filter ?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;WARNING: filters cannot be applied&quot;</span> <span class="o">+</span> \
+                            <span class="s">&quot;to a static tree</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">reset</span><span class="p">,</span> <span class="n">refresh</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.unapply_filter"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.unapply_filter">[docs]</a>    <span class="k">def</span> <span class="nf">unapply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filter_name</span><span class="p">,</span><span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Removes a filter from the tree.</span>
+
+<span class="sd">        @param filter_name: The name of filter to remove</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;WARNING: filters cannot be unapplied&quot;</span> <span class="o">+</span>\
+                            <span class="s">&quot;from a static tree</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">unapply_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">,</span> <span class="n">refresh</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewTree.reset_filters"><a class="viewcode-back" href="../../liblarch.html#liblarch.__init__.ViewTree.reset_filters">[docs]</a>    <span class="k">def</span> <span class="nf">reset_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">transparent_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Remove all filters currently set on the tree. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;WARNING: filters cannot be reset&quot;</span> <span class="o">+</span>\
+                            <span class="s">&quot;on a static tree</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">__ft</span><span class="o">.</span><span class="n">reset_filters</span><span class="p">(</span><span class="n">refresh</span><span class="p">,</span> <span class="n">transparent_only</span><span class="p">)</span>
+
+<span class="c"># -----------------------------------------------------------------------------</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Lionel Dricot &amp; Izidor Matušov.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

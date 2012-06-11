@@ -21,9 +21,16 @@
 # The default python interpreter used by make
 PYTHON ?= python
 
-# sphinx-apidoc settings
-DOC_OUTPUT_DIR=doc/
-DOC_OPTIONS=-f -F -H 'liblarch' -A 'Lionel Dricot & Izidor Matusov'
+# pylint settings
+PYLINTRC = utils/pylintrc
+
+# sphinx settings
+LIBLARCH_DOC_DIR  = docs/liblarch/src
+LIBLARCH_GTK_DOC_DIR  = docs/liblarch_gtk/src
+DOC_MAKE_FILE    = Makefile-doc
+LIBLARCH_DOC_OPTS    = -C $(LIBLARCH_DOC_DIR) -f $(DOC_MAKE_FILE)
+LIBLARCH_GTK_DOC_OPTS    = -C $(LIBLARCH_GTK_DOC_DIR) -f $(DOC_MAKE_FILE)
+DOC_OPTIONS      = -f -F
 
 
 .PHONY: clean clean-pyc clean-patchfiles clean-backupfiles doc doc-html \
@@ -40,11 +47,14 @@ ppa:
 	./build_packages remote-deb
 
 pylint:
-	-@pylint --rcfile pylintrc liblarch liblarch_gtk
+	-@pylint --rcfile $(PYLINTRC) liblarch liblarch_gtk
 
 pylint-report:
-	-@pylint --rcfile pylintrc --output-format=html liblarch > liblarch.html
-	-@pylint --rcfile pylintrc --output-format=html liblarch_gtk > liblarch_gtk.html
+	-@pylint --rcfile $(PYLINTRC) --output-format=html liblarch > liblarch.html
+	-@pylint --rcfile $(PYLINTRC) --output-format=html liblarch_gtk > liblarch_gtk.html
+
+develop:
+	@$(PYTHON) setup.py develop
 
 build:
 	@$(PYTHON) setup.py build
@@ -52,13 +62,11 @@ build:
 doc: gen-doc doc-html
 
 gen-doc:
-	sphinx-apidoc $(DOC_OPTIONS) -o $(DOC_OUTPUT_DIR) liblarch/
+	./bootstrap.py
 
 doc-html:
-	$(MAKE) clean html -C $(DOC_OUTPUT_DIR)
-
-develop:
-	@$(PYTHON) setup.py develop
+	$(MAKE) clean html $(LIBLARCH_DOC_OPTS)
+	$(MAKE) clean html $(LIBLARCH_GTK_DOC_OPTS)
 
 clean: clean-pyc clean-patchfiles clean-backupfiles clean-generated clean-dist \
        clean-doc clean-pylint

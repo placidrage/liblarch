@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liblarch_gtk.treemodel &mdash; liblarch_gtk 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liblarch_gtk 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch_gtk 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for liblarch_gtk.treemodel</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+<span class="c"># Liblarch - a library to handle directed acyclic graphs</span>
+<span class="c"># Copyright (c) 2011-2012 - Lionel Dricot &amp; Izidor Matušov</span>
+<span class="c">#</span>
+<span class="c"># This program is free software: you can redistribute it and/or modify it under</span>
+<span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+<span class="c"># Software Foundation, either version 3 of the License, or (at your option) any</span>
+<span class="c"># later version.</span>
+<span class="c">#</span>
+<span class="c"># This program is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="c"># FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more</span>
+<span class="c"># details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c"># along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="kn">import</span> <span class="n">Gtk</span>
+
+
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="TreeModel"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel">[docs]</a><span class="k">class</span> <span class="nc">TreeModel</span><span class="p">(</span><span class="n">Gtk</span><span class="o">.</span><span class="n">TreeStore</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Local copy of showed tree &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initializes parent and create list of columns. The first colum</span>
+<span class="sd">        is node_id of node &quot;&quot;&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count2</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">node</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">get_id</span><span class="p">()]]</span> <span class="o">+</span> <span class="n">types</span>
+        <span class="n">only_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">python_type</span> <span class="k">for</span> <span class="n">python_type</span><span class="p">,</span> <span class="n">access_method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">]</span>
+
+        <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeStore</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">only_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_paths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_position</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span>
+
+<div class="viewcode-block" id="TreeModel.set_column_function"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.set_column_function">[docs]</a>    <span class="k">def</span> <span class="nf">set_column_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_num</span><span class="p">,</span> <span class="n">column_func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Replace function for generating certain column.</span>
+
+<span class="sd">        Original use case was changing method of generating background</span>
+<span class="sd">        color during runtime - background by tags or due date &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">column_num</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="n">column_num</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">column_func</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="TreeModel.connect_model"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.connect_model">[docs]</a>    <span class="k">def</span> <span class="nf">connect_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Register &quot;signals&quot;, callbacks from liblarch.</span>
+<span class="sd">        </span>
+<span class="sd">        Also asks for the current status by providing add_task callback.</span>
+<span class="sd">        We are able to connect to liblarch tree on the fly. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">register_cllbck</span><span class="p">(</span><span class="s">&#39;node-added-inview&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">add_task</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">register_cllbck</span><span class="p">(</span><span class="s">&#39;node-deleted-inview&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_task</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">register_cllbck</span><span class="p">(</span><span class="s">&#39;node-modified-inview&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">update_task</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">register_cllbck</span><span class="p">(</span><span class="s">&#39;node-children-reordered&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">reorder_nodes</span><span class="p">)</span>
+
+        <span class="c"># Request the current state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_current_state</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="TreeModel.my_get_iter"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.my_get_iter">[docs]</a>    <span class="k">def</span> <span class="nf">my_get_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Because we sort the TreeStore, paths in the treestore are</span>
+<span class="sd">        not the same as paths in the FilteredTree. We do the  conversion here.</span>
+<span class="sd">        We receive a Liblarch path as argument and return a Gtk.TreeIter&quot;&quot;&quot;</span>
+        <span class="c">#The function is recursive. We take iter for path (A,B,C) in cache.</span>
+        <span class="c">#If there is not, we take iter for path (A,B) and try to find C.</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="p">():</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">nid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c">#We try to use the cache</span>
+        <span class="nb">iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_paths</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+        <span class="n">toreturn</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="nb">iter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_is_valid</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span> <span class="ow">and</span> <span class="n">nid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">count2</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">toreturn</span> <span class="o">=</span> <span class="nb">iter</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="c">#This is a small ad-hoc optimisation.</span>
+            <span class="c">#Instead of going through all the children nodes</span>
+            <span class="c">#We go directly at the last known position.</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_position</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pos</span><span class="p">:</span>
+                <span class="nb">iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_nth_child</span><span class="p">(</span><span class="n">root</span><span class="p">,</span><span class="n">pos</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">iter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">nid</span><span class="p">:</span>
+                    <span class="n">toreturn</span> <span class="o">=</span> <span class="nb">iter</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">toreturn</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">root</span><span class="p">:</span>
+                    <span class="nb">iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_children</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_iter_first</span><span class="p">()</span>
+                <span class="k">while</span> <span class="nb">iter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nid</span><span class="p">:</span>
+                    <span class="nb">iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_next</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_paths</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span>
+            <span class="n">toreturn</span> <span class="o">=</span> <span class="nb">iter</span>
+<span class="c">#        print &quot;%s / %s&quot; %(self.count2,self.count)</span>
+<span class="c">#        print &quot;my_get_iter %s : %s&quot; %(nid,self.get_string_from_iter(toreturn))</span>
+        <span class="k">return</span> <span class="n">toreturn</span>
+</div>
+<div class="viewcode-block" id="TreeModel.print_tree"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.print_tree">[docs]</a>    <span class="k">def</span> <span class="nf">print_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Print TreeStore as Tree into console &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">push_to_stack</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">iterator</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot; Macro which adds a new element into stack if it is possible &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">iterator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">level</span><span class="p">,</span> <span class="n">iterator</span><span class="p">))</span>
+
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">push_to_stack</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_iter_first</span><span class="p">())</span>
+
+        <span class="k">print</span> <span class="s">&quot;+&quot;</span><span class="o">*</span><span class="mi">50</span>
+        <span class="k">print</span> <span class="s">&quot;Treemodel print_tree: &quot;</span>
+        <span class="k">while</span> <span class="n">stack</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">level</span><span class="p">,</span> <span class="n">iterator</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+            <span class="k">print</span> <span class="s">&quot;=&gt;&quot;</span><span class="o">*</span><span class="n">level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">push_to_stack</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_next</span><span class="p">(</span><span class="n">iterator</span><span class="p">))</span>
+            <span class="n">push_to_stack</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_children</span><span class="p">(</span><span class="n">iterator</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&quot;+&quot;</span><span class="o">*</span><span class="mi">50</span>
+
+<span class="c">### INTERFACE TO LIBLARCH #####################################################</span>
+</div>
+<div class="viewcode-block" id="TreeModel.add_task"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.add_task">[docs]</a>    <span class="k">def</span> <span class="nf">add_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add new instance of node_id to position described at path.</span>
+
+<span class="sd">        @param node_id: identification of task</span>
+<span class="sd">        @param path: identification of position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="c"># Build a new row</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">python_type</span><span class="p">,</span> <span class="n">access_method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">access_method</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="c"># Find position to add task</span>
+        <span class="n">iter_path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">iterator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_get_iter</span><span class="p">(</span><span class="n">iter_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_position</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_n_children</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+        
+        <span class="c"># Show the new task if possible</span>
+<span class="c">#        self.row_has_child_toggled(self.get_path(it), it)</span>
+</div>
+<div class="viewcode-block" id="TreeModel.remove_task"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.remove_task">[docs]</a>    <span class="k">def</span> <span class="nf">remove_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Remove instance of node.</span>
+
+<span class="sd">        @param node_id: identification of task</span>
+<span class="sd">        @param path: identification of position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">it</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Trying to remove node </span><span class="si">%s</span><span class="s"> with no iterator&quot;</span><span class="o">%</span><span class="n">node_id</span><span class="p">)</span>
+        <span class="n">actual_node_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">actual_node_id</span> <span class="o">==</span> <span class="n">node_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_position</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeModel.update_task"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.update_task">[docs]</a>    <span class="k">def</span> <span class="nf">update_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update instance of node by rebuilding the row.</span>
+
+<span class="sd">        @param node_id: identification of task</span>
+<span class="sd">        @param path: identification of position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#We cannot assume that the node is in the tree because</span>
+        <span class="c">#update is asynchronus</span>
+        <span class="c">#Also, we should consider that missing an update is not critical</span>
+        <span class="c">#and ignoring the case where there is no iterator</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="c">#That call to my_get_iter is really slow!</span>
+            <span class="n">iterator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        
+            <span class="k">if</span> <span class="n">iterator</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">column_num</span><span class="p">,</span> <span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="n">access_method</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">access_method</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="n">column_num</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeModel.reorder_nodes"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.treemodel.TreeModel.reorder_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">reorder_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">neworder</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Reorder nodes.</span>
+<span class="sd">        </span>
+<span class="sd">        This is deprecated signal. In the past it was useful for reordering</span>
+<span class="sd">        showed nodes of tree. It was possible to delete just the last</span>
+<span class="sd">        element and therefore every element must be moved to the last position</span>
+<span class="sd">        and then deleted.</span>
+
+<span class="sd">        @param node_id: identification of root node</span>
+<span class="sd">        @param path: identification of poistion of root node</span>
+<span class="sd">        @param neworder: new order of children of root node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">it</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">neworder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_tree</span><span class="p">()</span>
+
+<span class="c"># -----------------------------------------------------------------------------</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch_gtk 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Lionel Dricot &amp; Izidor Matušov.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

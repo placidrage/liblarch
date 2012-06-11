@@ -54,15 +54,23 @@ params['liblarch_gtk'] = {
 standalone_packages = find_packages(exclude=['tests'])
 
 for package in standalone_packages:
+    pkg_version = liblarch.__version__
+
     setup(
-      version = liblarch.__version__,
+      version = pkg_version,
       url = 'https://live.gnome.org/liblarch',
       author = 'Lionel Dricot & Izidor Matušov',
       author_email = 'gtg-contributors@lists.launchpad.net',
       license = 'LGPLv3',
-
       name = package,
       packages = [package],
+      command_options={
+          'build_sphinx': {
+              'project': ('setup.py', package),
+              'version': ('setup.py', pkg_version),
+              'release': ('setup.py', pkg_version),
+          }
+      },
       **params[package]
     )
 

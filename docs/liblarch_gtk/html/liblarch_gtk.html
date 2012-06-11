@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liblarch_gtk Package &mdash; liblarch_gtk 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liblarch_gtk 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to liblarch_gtk’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to liblarch_gtk’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">liblarch_gtk 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="liblarch-gtk-package">
+<h1>liblarch_gtk Package<a class="headerlink" href="#liblarch-gtk-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">liblarch_gtk</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-liblarch_gtk.__init__"></span><dl class="class">
+<dt id="liblarch_gtk.__init__.TreeView">
+<em class="property">class </em><tt class="descclassname">liblarch_gtk.__init__.</tt><tt class="descname">TreeView</tt><big>(</big><em>tree</em>, <em>description</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">gi.overrides.Gtk.TreeView</span></tt></p>
+<p>Widget which display LibLarch FilteredTree.</p>
+<dl class="docutils">
+<dt>This widget extends Gtk.TreeView by several features:</dt>
+<dd><ul class="first last simple">
+<li>Drag&#8217;n&#8217;Drop support</li>
+<li>Sorting support</li>
+<li>separator rows</li>
+<li>background color of a row</li>
+<li>selection of multiple rows</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.collapse_node">
+<tt class="descname">collapse_node</tt><big>(</big><em>llpath</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.collapse_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.collapse_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hide children of a node</p>
+<p>This method is needed for &#8220;rember collapsed nodes&#8221; feature of GTG.
+Transform node_id into paths and those paths collapse. By default all
+children are expanded (see self.expand_all())</p>
+<dl class="docutils">
+<dt>&#64;parameter llpath - LibLarch path to the node. Node_id is extracted</dt>
+<dd>as the last parameter and then all instances of that node are
+collapsed. For retro-compatibility, we take llpath instead of
+node_id directly</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.get_columns">
+<tt class="descname">get_columns</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.get_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.get_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of columns name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.get_selected_nodes">
+<tt class="descname">get_selected_nodes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.get_selected_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.get_selected_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of node_id from liblarch for selected nodes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.on_child_toggled">
+<tt class="descname">on_child_toggled</tt><big>(</big><em>treemodel</em>, <em>path</em>, <em>iter</em>, <em>param=None</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.on_child_toggled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.on_child_toggled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand row</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.on_drag_data_get">
+<tt class="descname">on_drag_data_get</tt><big>(</big><em>treeview</em>, <em>context</em>, <em>selection</em>, <em>info</em>, <em>timestamp</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.on_drag_data_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.on_drag_data_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract data from the source of the DnD operation.</p>
+<p>Serialize iterators of selected tasks in format 
+&lt;iter&gt;,&lt;iter&gt;,...,&lt;iter&gt; and set it as parameter of DND</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.on_drag_data_received">
+<tt class="descname">on_drag_data_received</tt><big>(</big><em>treeview</em>, <em>context</em>, <em>x</em>, <em>y</em>, <em>selection</em>, <em>info</em>, <em>timestamp</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.on_drag_data_received"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.on_drag_data_received" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle a drop situation.</p>
+<p>First of all, we need to get id of node which should accept
+all draged nodes as their new children. If there is no node,
+drop to root node.</p>
+<p>Deserialize iterators of dragged nodes (see self.on_drag_data_get())
+Info parameter determines which target was used:</p>
+<blockquote>
+<div><ul class="simple">
+<li>info == 0 =&gt; internal DND within this TreeView</li>
+<li>info &gt; 0 =&gt; external DND</li>
+</ul>
+</div></blockquote>
+<p>In case of internal DND we just use Tree.move_node().
+In case of external DND we call function associated with that DND
+set by self.set_dnd_external()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_bg_color">
+<tt class="descname">set_bg_color</tt><big>(</big><em>color_func</em>, <em>color_column</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_bg_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_bg_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set which column and function for generating background color</p>
+<p>Function should be in format func(node, default_color)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_col_resizable">
+<tt class="descname">set_col_resizable</tt><big>(</big><em>col_name</em>, <em>resizable</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_col_resizable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_col_resizable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow/forbid column to be resizable</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_col_visible">
+<tt class="descname">set_col_visible</tt><big>(</big><em>col_name</em>, <em>visible</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_col_visible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_col_visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set visiblity of column.
+Allow to hide/show certain column</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_dnd_external">
+<tt class="descname">set_dnd_external</tt><big>(</big><em>sourcename</em>, <em>func</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_dnd_external"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_dnd_external" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new external target and initialize Drag&#8217;n&#8217;Drop support</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_dnd_name">
+<tt class="descname">set_dnd_name</tt><big>(</big><em>dndname</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_dnd_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_dnd_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets Drag&#8217;n&#8217;Drop name and initialize Drag&#8217;n&#8217;Drop support</p>
+<p>If ENABLE_SORTING, drag_drop signal must be handled by this widget.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_expander_column">
+<tt class="descname">set_expander_column</tt><big>(</big><em>col_name</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_expander_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_expander_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set expander column (that which expands through free space)
+This is just wrapper to use internal representation of columns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_main_search_column">
+<tt class="descname">set_main_search_column</tt><big>(</big><em>col_name</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_main_search_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_main_search_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set search column for GTK integrate search
+This is just wrapper to use internal representation of columns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_multiple_selection">
+<tt class="descname">set_multiple_selection</tt><big>(</big><em>multiple_selection</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_multiple_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_multiple_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow/forbid multiple selection in TreeView</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_row_separator_func">
+<tt class="descname">set_row_separator_func</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_row_separator_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_row_separator_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable support for row separators.</p>
+<dl class="docutils">
+<dt>&#64;param func - function which determines if a node is separator,</dt>
+<dd>None will disable support for row separators.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.set_sort_column">
+<tt class="descname">set_sort_column</tt><big>(</big><em>col_name</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.set_sort_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.set_sort_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select column to sort by it by default</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.__init__.TreeView.show">
+<tt class="descname">show</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#TreeView.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.TreeView.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows the TreeView and connect basetreemodel to LibLarch</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="liblarch_gtk.__init__.brightness">
+<tt class="descclassname">liblarch_gtk.__init__.</tt><tt class="descname">brightness</tt><big>(</big><em>color_str</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/__init__.html#brightness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.__init__.brightness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute brightness of a color on scale 0-1</p>
+<p>Courtesy to
+<a class="reference external" href="http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color">http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-liblarch_gtk.treemodel">
+<span id="treemodel-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">treemodel</span></tt> Module<a class="headerlink" href="#module-liblarch_gtk.treemodel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="liblarch_gtk.treemodel.TreeModel">
+<em class="property">class </em><tt class="descclassname">liblarch_gtk.treemodel.</tt><tt class="descname">TreeModel</tt><big>(</big><em>tree</em>, <em>types</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">gi.overrides.Gtk.TreeStore</span></tt></p>
+<p>Local copy of showed tree</p>
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.add_task">
+<tt class="descname">add_task</tt><big>(</big><em>node_id</em>, <em>path</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.add_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.add_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new instance of node_id to position described at path.</p>
+<p>&#64;param node_id: identification of task
+&#64;param path: identification of position</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.connect_model">
+<tt class="descname">connect_model</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.connect_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.connect_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register &#8220;signals&#8221;, callbacks from liblarch.</p>
+<p>Also asks for the current status by providing add_task callback.
+We are able to connect to liblarch tree on the fly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.my_get_iter">
+<tt class="descname">my_get_iter</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.my_get_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.my_get_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Because we sort the TreeStore, paths in the treestore are
+not the same as paths in the FilteredTree. We do the  conversion here.
+We receive a Liblarch path as argument and return a Gtk.TreeIter</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.print_tree">
+<tt class="descname">print_tree</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.print_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.print_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print TreeStore as Tree into console</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.remove_task">
+<tt class="descname">remove_task</tt><big>(</big><em>node_id</em>, <em>path</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.remove_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.remove_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove instance of node.</p>
+<p>&#64;param node_id: identification of task
+&#64;param path: identification of position</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.reorder_nodes">
+<tt class="descname">reorder_nodes</tt><big>(</big><em>node_id</em>, <em>path</em>, <em>neworder</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.reorder_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.reorder_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reorder nodes.</p>
+<p>This is deprecated signal. In the past it was useful for reordering
+showed nodes of tree. It was possible to delete just the last
+element and therefore every element must be moved to the last position
+and then deleted.</p>
+<p>&#64;param node_id: identification of root node
+&#64;param path: identification of poistion of root node
+&#64;param neworder: new order of children of root node</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.set_column_function">
+<tt class="descname">set_column_function</tt><big>(</big><em>column_num</em>, <em>column_func</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.set_column_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.set_column_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace function for generating certain column.</p>
+<p>Original use case was changing method of generating background
+color during runtime - background by tags or due date</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liblarch_gtk.treemodel.TreeModel.update_task">
+<tt class="descname">update_task</tt><big>(</big><em>node_id</em>, <em>path</em><big>)</big><a class="reference internal" href="_modules/liblarch_gtk/treemodel.html#TreeModel.update_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liblarch_gtk.treemodel.TreeModel.update_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update instance of node by rebuilding the row.</p>
+<p>&#64;param node_id: identification of task
+&#64;param path: identification of position</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">liblarch_gtk Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">liblarch_gtk</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-liblarch_gtk.treemodel"><tt class="docutils literal"><span class="pre">treemodel</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to liblarch_gtk&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/liblarch_gtk.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to liblarch_gtk’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">liblarch_gtk 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Lionel Dricot &amp; Izidor Matušov.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

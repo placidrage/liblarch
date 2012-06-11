@@ -1,0 +1,670 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liblarch_gtk.__init__ &mdash; liblarch_gtk 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liblarch_gtk 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch_gtk 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for liblarch_gtk.__init__</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+<span class="c"># Liblarch - a library to handle directed acyclic graphs</span>
+<span class="c"># Copyright (c) 2011-2012 - Lionel Dricot &amp; Izidor Matušov</span>
+<span class="c">#</span>
+<span class="c"># This program is free software: you can redistribute it and/or modify it under</span>
+<span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+<span class="c"># Software Foundation, either version 3 of the License, or (at your option) any</span>
+<span class="c"># later version.</span>
+<span class="c">#</span>
+<span class="c"># This program is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="c"># FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more</span>
+<span class="c"># details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c"># along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="kn">import</span> <span class="n">GObject</span><span class="p">,</span> <span class="n">Gtk</span><span class="p">,</span> <span class="n">Gdk</span>
+
+<span class="kn">from</span> <span class="nn">liblarch_gtk.treemodel</span> <span class="kn">import</span> <span class="n">TreeModel</span>
+
+
+<span class="c"># Useful for debugging purpose.</span>
+<span class="c"># Disabling that will disable the TreeModelSort on top of our TreeModel</span>
+<span class="n">ENABLE_SORTING</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">USE_TREEMODELFILTER</span> <span class="o">=</span> <span class="bp">False</span>
+
+
+<span class="n">BRITGHTNESS_CACHE</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="brightness"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.brightness">[docs]</a><span class="k">def</span> <span class="nf">brightness</span><span class="p">(</span><span class="n">color_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compute brightness of a color on scale 0-1</span>
+
+<span class="sd">    Courtesy to</span>
+<span class="sd">    http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">BRITGHTNESS_CACHE</span>
+
+    <span class="k">if</span> <span class="n">color_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">BRITGHTNESS_CACHE</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Gdk</span><span class="o">.</span><span class="n">color_parse</span><span class="p">(</span><span class="n">color_str</span><span class="p">)</span>
+        <span class="n">brightness</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2126</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">red</span> <span class="o">+</span> <span class="mf">0.7152</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">green</span> <span class="o">+</span> <span class="mf">0.0722</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">blue</span><span class="p">)</span><span class="o">/</span><span class="mf">65535.0</span>
+        <span class="n">BRITGHTNESS_CACHE</span><span class="p">[</span><span class="n">color_str</span><span class="p">]</span> <span class="o">=</span> <span class="n">brightness</span>
+    <span class="k">return</span> <span class="n">BRITGHTNESS_CACHE</span><span class="p">[</span><span class="n">color_str</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="TreeView"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView">[docs]</a><span class="k">class</span> <span class="nc">TreeView</span><span class="p">(</span><span class="n">Gtk</span><span class="o">.</span><span class="n">TreeView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Widget which display LibLarch FilteredTree.</span>
+
+<span class="sd">    This widget extends Gtk.TreeView by several features:</span>
+<span class="sd">      * Drag&#39;n&#39;Drop support</span>
+<span class="sd">      * Sorting support</span>
+<span class="sd">      * separator rows</span>
+<span class="sd">      * background color of a row</span>
+<span class="sd">      * selection of multiple rows</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__string_signal__</span> <span class="o">=</span> <span class="p">(</span><span class="n">GObject</span><span class="o">.</span><span class="n">SignalFlags</span><span class="o">.</span><span class="n">RUN_FIRST</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="p">))</span>
+    <span class="n">__gsignals__</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;node-expanded&#39;</span> <span class="p">:</span> <span class="n">__string_signal__</span><span class="p">,</span> \
+                    <span class="s">&#39;node-collapsed&#39;</span><span class="p">:</span> <span class="n">__string_signal__</span><span class="p">,</span> \
+                    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Build the widget</span>
+
+<span class="sd">        @param  tree - LibLarch FilteredTree</span>
+<span class="sd">        @param  description - definition of columns.</span>
+
+<span class="sd">        Parameters of description dictionary for a column:</span>
+<span class="sd">          * value =&gt; (type of values, function for generating value from a node)</span>
+<span class="sd">          * renderer =&gt; (renderer_attribute, renderer object)</span>
+
+<span class="sd">          Optional:</span>
+<span class="sd">          * order =&gt; specify order of column otherwise use natural oreder</span>
+<span class="sd">          * expandable =&gt; is the column expandable?</span>
+<span class="sd">          * resizable =&gt; is the column resizable?</span>
+<span class="sd">          * visible =&gt; is the column visible?</span>
+<span class="sd">          * title =&gt; title of column</span>
+<span class="sd">          * new_colum =&gt; do not create a separate column, just continue with the previous one</span>
+<span class="sd">                (this can be used to create columns without borders)</span>
+<span class="sd">          * sorting =&gt; allow default sorting on this column</span>
+<span class="sd">          * sorting_func =&gt; use special function for sorting on this func</span>
+
+<span class="sd">        Example of columns descriptions:</span>
+<span class="sd">        description = { &#39;title&#39;: {</span>
+<span class="sd">                &#39;value&#39;: [str, self.task_title_column],</span>
+<span class="sd">                &#39;renderer&#39;: [&#39;markup&#39;, Gtk.CellRendererText()],</span>
+<span class="sd">                &#39;order&#39;: 0</span>
+<span class="sd">            }}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeView</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bg_color_column</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator_func</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dnd_internal_target</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="c"># Sort columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order_of_column</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="mi">9999</span>
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;order&#39;</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span>
+            <span class="n">last</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">order_of_column</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">order</span><span class="p">,</span> <span class="n">col_name</span><span class="p">))</span>
+
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sorting_func</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c"># Build the first coulumn if user starts with new_colum=False</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeViewColumn</span><span class="p">()</span>
+
+        <span class="c"># Build columns according to the order</span>
+        <span class="k">for</span> <span class="n">col_num</span><span class="p">,</span> <span class="p">(</span><span class="n">order_num</span><span class="p">,</span> <span class="n">col_name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order_of_column</span><span class="p">),</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+            <span class="n">types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">])</span>
+
+            <span class="n">expand</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;expandable&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+            <span class="n">resizable</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;resizable&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="n">visible</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;visible&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s">&#39;renderer&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                <span class="n">rend_attribute</span><span class="p">,</span> <span class="n">renderer</span> <span class="o">=</span> <span class="n">desc</span><span class="p">[</span><span class="s">&#39;renderer&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rend_attribute</span> <span class="o">=</span> <span class="s">&#39;markup&#39;</span>
+                <span class="n">renderer</span> <span class="o">=</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">CellRendererText</span><span class="p">()</span>
+
+            <span class="c"># If new_colum=False, do not create new column, use the previous one</span>
+            <span class="c"># It will create columns without borders</span>
+            <span class="k">if</span> <span class="n">desc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;new_column&#39;</span><span class="p">,</span><span class="bp">True</span><span class="p">):</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeViewColumn</span><span class="p">()</span>
+                <span class="n">newcol</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newcol</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">visible</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s">&#39;title&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">])</span>
+
+            <span class="n">col</span><span class="o">.</span><span class="n">pack_start</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">)</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="n">rend_attribute</span><span class="p">,</span> <span class="n">col_num</span><span class="p">)</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">set_resizable</span><span class="p">(</span><span class="n">resizable</span><span class="p">)</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">set_expand</span><span class="p">(</span><span class="n">expand</span><span class="p">)</span>
+
+            <span class="c"># Allow to set background color</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">set_cell_data_func</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celldatafunction</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">newcol</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append_column</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">col_num</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">ENABLE_SORTING</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s">&#39;sorting&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                    <span class="c"># Just allow sorting and use default comparing</span>
+                    <span class="n">sort_num</span><span class="p">,</span> <span class="n">sort_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="s">&#39;sorting&#39;</span><span class="p">]]</span>
+                    <span class="n">col</span><span class="o">.</span><span class="n">set_sort_column_id</span><span class="p">(</span><span class="n">sort_num</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s">&#39;sorting_func&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                    <span class="c"># Use special funcion for comparing, e.g. dates</span>
+                    <span class="n">sorting_func</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">col_num</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">desc</span><span class="p">[</span><span class="s">&#39;sorting_func&#39;</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">basetree</span> <span class="o">=</span> <span class="n">tree</span>
+        <span class="c"># Build the model around LibLarch tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span> <span class="o">=</span> <span class="n">TreeModel</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">types</span><span class="p">)</span>
+        <span class="c"># Applying an intermediate treemodelfilter, for debugging purpose</span>
+        <span class="k">if</span> <span class="n">USE_TREEMODELFILTER</span><span class="p">:</span>
+            <span class="n">treemodelfilter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span><span class="o">.</span><span class="n">filter_new</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">treemodelfilter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span>
+        <span class="c"># Apply TreeModelSort to be able to sort</span>
+        <span class="k">if</span> <span class="n">ENABLE_SORTING</span><span class="p">:</span>
+<span class="c">#            self.treemodel = Gtk.TreeModelSort(treemodelfilter)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span>
+            <span class="k">for</span> <span class="n">col_num</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">sort_func</span> <span class="ow">in</span> <span class="n">sorting_func</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">set_sort_func</span><span class="p">(</span><span class="n">col_num</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_sort_func</span><span class="p">,</span> <span class="n">sort_func</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">set_sort_column_id</span><span class="p">(</span><span class="n">col_num</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span> <span class="o">=</span> <span class="n">treemodelfilter</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">expand_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">collapsed_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;row-expanded&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;expanded&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;row-collapsed&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__emit</span><span class="p">,</span> <span class="s">&#39;collapsed&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;row-has-child-toggled&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_child_toggled</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Emitt expanded/collapsed signal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c">#recreating the path of the collapsed node</span>
+        <span class="n">ll_path</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)):</span>
+            <span class="n">temp_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ll_path</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">temp_iter</span><span class="p">,</span><span class="mi">0</span><span class="p">),)</span>
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="s">&#39;expanded&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s">&#39;node-expanded&#39;</span><span class="p">,</span> <span class="n">ll_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="s">&#39;collapsed&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s">&#39;node-collapsed&#39;</span><span class="p">,</span> <span class="n">ll_path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TreeView.on_child_toggled"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.on_child_toggled">[docs]</a>    <span class="k">def</span> <span class="nf">on_child_toggled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">treemodel</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Expand row &quot;&quot;&quot;</span>
+        <span class="c">#is the toggled node in the collapsed paths?</span>
+        <span class="n">collapsed</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">nid</span> <span class="o">=</span> <span class="n">treemodel</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">iter</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">collapsed</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collapsed_paths</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">nid</span><span class="p">:</span>
+                    <span class="n">collapsed</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="nb">iter</span> <span class="o">=</span> <span class="n">treemodel</span><span class="o">.</span><span class="n">iter_parent</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_expanded</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">collapsed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expand_row</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+            
+</div>
+<div class="viewcode-block" id="TreeView.collapse_node"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.collapse_node">[docs]</a>    <span class="k">def</span> <span class="nf">collapse_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llpath</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Hide children of a node</span>
+<span class="sd">        </span>
+<span class="sd">        This method is needed for &quot;rember collapsed nodes&quot; feature of GTG.</span>
+<span class="sd">        Transform node_id into paths and those paths collapse. By default all</span>
+<span class="sd">        children are expanded (see self.expand_all())</span>
+<span class="sd">        </span>
+<span class="sd">        @parameter llpath - LibLarch path to the node. Node_id is extracted</span>
+<span class="sd">            as the last parameter and then all instances of that node are</span>
+<span class="sd">            collapsed. For retro-compatibility, we take llpath instead of</span>
+<span class="sd">            node_id directly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node_id</span> <span class="o">=</span> <span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&quot;&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">node_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Missing node_id in path {0!s}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">llpath</span><span class="p">))</span>
+
+        <span class="n">schedule_next</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetree</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="nb">iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span><span class="o">.</span><span class="n">my_get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">iter</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">target_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">node_id</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">collapse_row</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">collapsed_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">schedule_next</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="n">schedule_next</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basetree</span><span class="o">.</span><span class="n">queue_action</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">collapse_node</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="n">llpath</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeView.show"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Shows the TreeView and connect basetreemodel to LibLarch &quot;&quot;&quot;</span>
+        <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeView</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basetreemodel</span><span class="o">.</span><span class="n">connect_model</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="TreeView.get_columns"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.get_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the list of columns name &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="TreeView.set_main_search_column"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_main_search_column">[docs]</a>    <span class="k">def</span> <span class="nf">set_main_search_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set search column for GTK integrate search</span>
+<span class="sd">        This is just wrapper to use internal representation of columns&quot;&quot;&quot;</span>
+        <span class="n">col_num</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_search_column</span><span class="p">(</span><span class="n">col_num</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeView.set_expander_column"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_expander_column">[docs]</a>    <span class="k">def</span> <span class="nf">set_expander_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set expander column (that which expands through free space)</span>
+<span class="sd">        This is just wrapper to use internal representation of columns&quot;&quot;&quot;</span>
+        <span class="n">col_num</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&quot;expander-column&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeView.set_sort_column"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_sort_column">[docs]</a>    <span class="k">def</span> <span class="nf">set_sort_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Select column to sort by it by default &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ENABLE_SORTING</span><span class="p">:</span>
+            <span class="n">col_num</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">set_sort_column_id</span><span class="p">(</span><span class="n">col_num</span><span class="p">,</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">SortType</span><span class="o">.</span><span class="n">ASCENDING</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeView.set_col_visible"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_col_visible">[docs]</a>    <span class="k">def</span> <span class="nf">set_col_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span><span class="n">visible</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set visiblity of column.</span>
+<span class="sd">        Allow to hide/show certain column &quot;&quot;&quot;</span>
+        <span class="n">col_num</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">visible</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeView.set_col_resizable"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_col_resizable">[docs]</a>    <span class="k">def</span> <span class="nf">set_col_resizable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">resizable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Allow/forbid column to be resizable &quot;&quot;&quot;</span>
+        <span class="n">col_num</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">set_resizable</span><span class="p">(</span><span class="n">resizable</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeView.set_bg_color"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_bg_color">[docs]</a>    <span class="k">def</span> <span class="nf">set_bg_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_func</span><span class="p">,</span> <span class="n">color_column</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set which column and function for generating background color</span>
+
+<span class="sd">        Function should be in format func(node, default_color)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">closure_default_color</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Set default color to the function.</span>
+
+<span class="sd">            Transform function from func(node, default_color) into func(node).</span>
+<span class="sd">            Default color is computed based on some GTK style magic.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">column</span><span class="o">.</span><span class="n">get_tree_view</span><span class="p">()</span><span class="o">.</span><span class="n">get_style</span><span class="p">()</span><span class="o">.</span><span class="n">base</span><span class="p">[</span><span class="n">Gtk</span><span class="o">.</span><span class="n">StateType</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">]</span>
+            <span class="k">return</span> <span class="k">lambda</span> <span class="n">node</span><span class="p">:</span> <span class="n">func</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">color_column</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bg_color_column</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">color_column</span><span class="p">]</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">closure_default_color</span><span class="p">(</span><span class="n">color_func</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">set_column_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bg_color_column</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s">&quot;There is no colum {0} to use to set color&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">color_column</span><span class="p">)</span>
+            <span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_sort_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">iter1</span><span class="p">,</span> <span class="n">iter2</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sort two iterators by function which gets node objects.</span>
+<span class="sd">        This is a simple wrapper which prepares node objects and then</span>
+<span class="sd">        call comparing function. In other case return default value -1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node_id_a</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">iter1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">node_id_b</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">iter2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node_id_a</span> <span class="ow">and</span> <span class="n">node_id_b</span> <span class="ow">and</span> <span class="n">func</span><span class="p">:</span>
+            <span class="nb">id</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">treemodel</span><span class="o">.</span><span class="n">get_sort_column_id</span><span class="p">()</span>
+            <span class="n">node_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id_a</span><span class="p">)</span>
+            <span class="n">node_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id_b</span><span class="p">)</span>
+            <span class="n">sort</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sort</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">sort</span>
+
+    <span class="k">def</span> <span class="nf">_celldatafunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">myiter</span><span class="p">,</span> <span class="n">user_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine background color for cell</span>
+
+<span class="sd">        Requirements: self.bg_color_column must be set</span>
+<span class="sd">        (see self.set_bg_color())</span>
+
+<span class="sd">        Set background color based on a certain column value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg_color_column</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">myiter</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">iter_is_valid</span><span class="p">(</span><span class="n">myiter</span><span class="p">):</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">myiter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg_color_column</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">CellRendererText</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">brightness</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="n">fg_color</span> <span class="o">=</span> <span class="s">&#39;#FFFFFF&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fg_color</span> <span class="o">=</span> <span class="s">&#39;#000000&#39;</span>
+            <span class="n">cell</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&quot;foreground&quot;</span><span class="p">,</span> <span class="n">fg_color</span><span class="p">)</span>
+
+        <span class="n">cell</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&quot;cell-background&quot;</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+
+    <span class="c">######### DRAG-N-DROP functions #####################################</span>
+
+<div class="viewcode-block" id="TreeView.set_dnd_name"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_dnd_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_dnd_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dndname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sets Drag&#39;n&#39;Drop name and initialize Drag&#39;n&#39;Drop support</span>
+<span class="sd">        </span>
+<span class="sd">        If ENABLE_SORTING, drag_drop signal must be handled by this widget.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dnd_internal_target</span> <span class="o">=</span> <span class="n">dndname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init_dnd</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;drag_data_get&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_drag_data_get</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;drag_data_received&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_drag_data_received</span><span class="p">)</span>
+            
+</div>
+<div class="viewcode-block" id="TreeView.set_dnd_external"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_dnd_external">[docs]</a>    <span class="k">def</span> <span class="nf">set_dnd_external</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a new external target and initialize Drag&#39;n&#39;Drop support&quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sourcename</span><span class="p">,</span> <span class="n">func</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init_dnd</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">__init_dnd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize Drag&#39;n&#39;Drop support</span>
+<span class="sd">        </span>
+<span class="sd">        Firstly build list of DND targets:</span>
+<span class="sd">            * name</span>
+<span class="sd">            * scope - just the same widget / same application</span>
+<span class="sd">            * id</span>
+
+<span class="sd">        Enable DND by calling enable_model_drag_dest(), </span>
+<span class="sd">        enable_model-drag_source()</span>
+
+<span class="sd">        It didnt use support from Gtk.Widget(drag_source_set(),</span>
+<span class="sd">        drag_dest_set()). To know difference, look in PyGTK FAQ:</span>
+<span class="sd">        http://faq.pygtk.org/index.py?file=faq13.033.htp&amp;req=show</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defer_select</span> <span class="o">=</span> <span class="bp">False</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dnd_internal_target</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s">&#39;Cannot initialize DND without a valid name</span><span class="se">\n</span><span class="s">&#39;</span>
+            <span class="n">error</span> <span class="o">+=</span> <span class="s">&#39;Use set_dnd_name() first&#39;</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            
+        <span class="n">dnd_targets</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">dnd_internal_target</span><span class="p">,</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">TargetFlags</span><span class="o">.</span><span class="n">SAME_WIDGET</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span><span class="p">[</span><span class="n">target</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dnd_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">TargetFlags</span><span class="o">.</span><span class="n">SAME_APP</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_model_drag_source</span><span class="p">(</span>
+            <span class="n">Gdk</span><span class="o">.</span><span class="n">ModifierType</span><span class="o">.</span><span class="n">BUTTON1_MASK</span><span class="p">,</span>
+            <span class="n">dnd_targets</span><span class="p">,</span>
+            <span class="n">Gdk</span><span class="o">.</span><span class="n">DragAction</span><span class="o">.</span><span class="n">DEFAULT</span> <span class="o">|</span> <span class="n">Gdk</span><span class="o">.</span><span class="n">DragAction</span><span class="o">.</span><span class="n">MOVE</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_model_drag_dest</span><span class="p">(</span>
+            <span class="n">dnd_targets</span><span class="p">,</span>
+            <span class="n">Gdk</span><span class="o">.</span><span class="n">DragAction</span><span class="o">.</span><span class="n">DEFAULT</span> <span class="o">|</span> <span class="n">Gdk</span><span class="o">.</span><span class="n">DragAction</span><span class="o">.</span><span class="n">MOVE</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="TreeView.on_drag_data_get"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.on_drag_data_get">[docs]</a>    <span class="k">def</span> <span class="nf">on_drag_data_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">treeview</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract data from the source of the DnD operation.</span>
+
+<span class="sd">        Serialize iterators of selected tasks in format </span>
+<span class="sd">        &lt;iter&gt;,&lt;iter&gt;,...,&lt;iter&gt; and set it as parameter of DND</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">treeselection</span> <span class="o">=</span> <span class="n">treeview</span><span class="o">.</span><span class="n">get_selection</span><span class="p">()</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">paths</span> <span class="o">=</span> <span class="n">treeselection</span><span class="o">.</span><span class="n">get_selected_rows</span><span class="p">()</span>
+        <span class="n">iters</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+        <span class="n">iter_str</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="n">get_string_from_iter</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span> <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="n">iters</span><span class="p">])</span>
+        <span class="n">selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dnd_internal_target</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">iter_str</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TreeView.on_drag_data_received"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.on_drag_data_received">[docs]</a>    <span class="k">def</span> <span class="nf">on_drag_data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">treeview</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span>\
+                              <span class="n">timestamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Handle a drop situation.</span>
+
+<span class="sd">        First of all, we need to get id of node which should accept</span>
+<span class="sd">        all draged nodes as their new children. If there is no node,</span>
+<span class="sd">        drop to root node.</span>
+
+<span class="sd">        Deserialize iterators of dragged nodes (see self.on_drag_data_get())</span>
+<span class="sd">        Info parameter determines which target was used:</span>
+<span class="sd">            * info == 0 =&gt; internal DND within this TreeView</span>
+<span class="sd">            * info &gt; 0 =&gt; external DND</span>
+<span class="sd">        </span>
+<span class="sd">        In case of internal DND we just use Tree.move_node().</span>
+<span class="sd">        In case of external DND we call function associated with that DND</span>
+<span class="sd">        set by self.set_dnd_external()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#TODO: it should be configurable for each TreeView if you want:</span>
+        <span class="c"># 0 : no drag-n-drop at all</span>
+        <span class="c"># 1 : drag-n-drop move the node</span>
+        <span class="c"># 2 : drag-n-drop copy the node </span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">treeview</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span>
+        <span class="n">drop_info</span> <span class="o">=</span> <span class="n">treeview</span><span class="o">.</span><span class="n">get_dest_row_at_pos</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">drop_info</span><span class="p">:</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">position</span> <span class="o">=</span> <span class="n">drop_info</span>
+            <span class="nb">iter</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="c"># Must add the task to the parent of the task situated</span>
+            <span class="c"># before/after </span>
+            <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeViewDropPosition</span><span class="o">.</span><span class="n">BEFORE</span> <span class="ow">or</span>\
+               <span class="n">position</span> <span class="o">==</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeViewDropPosition</span><span class="o">.</span><span class="n">AFTER</span><span class="p">:</span>
+                <span class="c"># Get sibling parent</span>
+                <span class="n">destination_iter</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">iter_parent</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># Must add task as a child of the dropped-on iter</span>
+                <span class="c"># Get parent</span>
+                <span class="n">destination_iter</span> <span class="o">=</span> <span class="nb">iter</span>
+
+            <span class="k">if</span> <span class="n">destination_iter</span><span class="p">:</span>
+                <span class="n">destination_tid</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">destination_iter</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">#it means we have drag-n-dropped above the first task</span>
+                <span class="c"># we should consider the destination as a root then.</span>
+                <span class="n">destination_tid</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Must add the task to the root</span>
+            <span class="c"># Parent = root =&gt; iter=None</span>
+            <span class="n">destination_tid</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetree</span><span class="o">.</span><span class="n">get_basetree</span><span class="p">()</span>
+
+        <span class="c"># Get dragged iter as a TaskTreeModel iter</span>
+        <span class="c"># If there is no selected task (empty selection.data), </span>
+        <span class="c"># explictly skip handling it (set to empty list)</span>
+        <span class="k">if</span> <span class="n">selection</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">iters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iters</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+
+        <span class="n">dragged_iters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="n">iters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">info</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">dragged_iters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_iter_from_string</span><span class="p">(</span><span class="nb">iter</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="c">#I hate to silently fail but we have no choice.</span>
+                    <span class="c">#It means that the iter is not good.</span>
+                    <span class="c">#Thanks shitty gtk API for not allowing us to test the string</span>
+                    <span class="n">dragged_iter</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="k">elif</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span> <span class="ow">and</span> <span class="n">destination_tid</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span><span class="p">[</span><span class="n">info</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="n">src_model</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get_source_widget</span><span class="p">()</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span>
+                <span class="n">dragged_iters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src_model</span><span class="o">.</span><span class="n">get_iter_from_string</span><span class="p">(</span><span class="nb">iter</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">dragged_iter</span> <span class="ow">in</span> <span class="n">dragged_iters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">info</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dragged_iter</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">iter_is_valid</span><span class="p">(</span><span class="n">dragged_iter</span><span class="p">):</span>
+                    <span class="n">dragged_tid</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">dragged_iter</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">tree</span><span class="o">.</span><span class="n">move_node</span><span class="p">(</span><span class="n">dragged_tid</span><span class="p">,</span> <span class="n">new_parent_id</span><span class="o">=</span><span class="n">destination_tid</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&#39;Problem with dragging: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dnd_external_targets</span> <span class="ow">and</span> <span class="n">destination_tid</span><span class="p">:</span>
+                <span class="n">source</span> <span class="o">=</span> <span class="n">src_model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">dragged_iter</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="c"># Handle external Drag&#39;n&#39;Drop</span>
+                <span class="n">f</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">destination_tid</span><span class="p">)</span>
+
+
+    <span class="c">######### Separators support ##############################################</span></div>
+    <span class="k">def</span> <span class="nf">_separator_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">itera</span><span class="p">,</span> <span class="n">user_data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call user function to determine if this node is separator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">itera</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">iter_is_valid</span><span class="p">(</span><span class="n">itera</span><span class="p">):</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">itera</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basetree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">separator_func</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">separator_func</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="TreeView.set_row_separator_func"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_row_separator_func">[docs]</a>    <span class="k">def</span> <span class="nf">set_row_separator_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Enable support for row separators.</span>
+
+<span class="sd">        @param func - function which determines if a node is separator,</span>
+<span class="sd">            None will disable support for row separators.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator_func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="n">Gtk</span><span class="o">.</span><span class="n">TreeView</span><span class="o">.</span><span class="n">set_row_separator_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_separator_func</span><span class="p">)</span>
+
+    <span class="c">######### Multiple selection ##############################################</span></div>
+<div class="viewcode-block" id="TreeView.get_selected_nodes"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.get_selected_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_selected_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return list of node_id from liblarch for selected nodes &quot;&quot;&quot;</span>
+        <span class="c"># Get the selection in the Gtk.TreeView</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selection</span><span class="p">()</span>
+        <span class="c"># Get the selection iter</span>
+        <span class="k">if</span> <span class="n">selection</span><span class="o">.</span><span class="n">count_selected_rows</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">paths</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get_selected_rows</span><span class="p">()</span>
+            <span class="n">iters</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">get_iter</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+            <span class="n">ts</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span>
+            <span class="c">#0 is the column of the tid</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="n">iters</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">ids</span>
+</div>
+<div class="viewcode-block" id="TreeView.set_multiple_selection"><a class="viewcode-back" href="../../liblarch_gtk.html#liblarch_gtk.__init__.TreeView.set_multiple_selection">[docs]</a>    <span class="k">def</span> <span class="nf">set_multiple_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple_selection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Allow/forbid multiple selection in TreeView &quot;&quot;&quot;</span>
+        <span class="c"># TODO support for dragging multiple rows at the same time</span>
+        <span class="c"># See LP #817433</span>
+
+        <span class="k">if</span> <span class="n">multiple_selection</span><span class="p">:</span>
+            <span class="n">selection_type</span> <span class="o">=</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">SelectionMode</span><span class="o">.</span><span class="n">MULTIPLE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">selection_type</span> <span class="o">=</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">SelectionMode</span><span class="o">.</span><span class="n">SINGLE</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_selection</span><span class="p">()</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">selection_type</span><span class="p">)</span>
+
+<span class="c"># -----------------------------------------------------------------------------</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch_gtk 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Lionel Dricot &amp; Izidor Matušov.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

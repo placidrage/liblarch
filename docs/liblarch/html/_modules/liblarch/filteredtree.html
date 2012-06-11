@@ -1,0 +1,850 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liblarch.filteredtree &mdash; liblarch 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    <link rel="top" title="liblarch 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for liblarch.filteredtree</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+<span class="c"># Liblarch - a library to handle directed acyclic graphs</span>
+<span class="c"># Copyright (c) 2011-2012 - Lionel Dricot &amp; Izidor Matušov</span>
+<span class="c">#</span>
+<span class="c"># This program is free software: you can redistribute it and/or modify it under</span>
+<span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+<span class="c"># Software Foundation, either version 3 of the License, or (at your option) any</span>
+<span class="c"># later version.</span>
+<span class="c">#</span>
+<span class="c"># This program is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="c"># FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more</span>
+<span class="c"># details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c"># along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c"># -----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="kn">import</span> <span class="n">GObject</span>
+
+
+<div class="viewcode-block" id="FilteredTree"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree">[docs]</a><span class="k">class</span> <span class="nc">FilteredTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FilteredTree is the most important and also the most buggy part of</span>
+<span class="sd">    LibLarch.</span>
+
+<span class="sd">    FilteredTree transforms general changes in tree like creating/removing </span>
+<span class="sd">    relationships between nodes and adding/updating/removing nodes into a serie</span>
+<span class="sd">    of simple steps which can be for instance by GTK Widget.</span>
+
+<span class="sd">    FilteredTree allows filtering - hiding certain nodes defined by a predicate.</span>
+
+<span class="sd">    The reason of most bugs is that FilteredTree is request to update a node.</span>
+<span class="sd">    FilteredTree must update its ancestors and also decestors. You cann&#39;t do that</span>
+<span class="sd">    by a simple recursion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">filtersbank</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct a layer where filters could by applied</span>
+
+<span class="sd">        @param tree: Original tree to filter.</span>
+<span class="sd">        @param filtersbank: Filter bank which stores filters</span>
+<span class="sd">        @param refresh: Requests all nodes in the beginning? Additional</span>
+<span class="sd">            filters can be added and refresh can be done later</span>
+
+<span class="sd">        _flat defines whether only nodes without children can be shown.</span>
+<span class="sd">        For example WorkView filter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callcount</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;up&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s">&#39;down&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s">&#39;both&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>
+
+        <span class="c"># Cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c"># Set root_id by the name of FilteredTree</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span> <span class="o">=</span> <span class="s">&quot;anonymous_root&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span> <span class="o">=</span> <span class="s">&quot;root_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;parents&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;children&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_paths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># Connect to signals from MainTree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span><span class="s">&quot;node-added&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__external_modify</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span><span class="s">&quot;node-modified&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__external_modify</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span><span class="s">&quot;node-deleted&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__external_modify</span><span class="p">)</span>
+
+        <span class="c"># Filters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__flat</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span> <span class="o">=</span> <span class="n">filtersbank</span>
+        
+        <span class="k">if</span> <span class="n">refresh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refilter</span><span class="p">()</span>
+            
+
+<div class="viewcode-block" id="FilteredTree.set_callback"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.set_callback">[docs]</a>    <span class="k">def</span> <span class="nf">set_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span><span class="n">node_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register a callback for an event.</span>
+
+<span class="sd">        It is possible to have just one callback for event.</span>
+<span class="sd">        @param event: one of added, modified, deleted, reordered</span>
+<span class="sd">        @param func: callback function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s">&#39;runonce&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">node_id</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;runonce callback should come with a node_id&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                <span class="c">#it is essential to idle_add to avoid hard recursion</span>
+                <span class="n">GObject</span><span class="o">.</span><span class="n">idle_add</span><span class="p">(</span><span class="n">func</span><span class="p">,</span><span class="n">param</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">func</span><span class="p">,</span><span class="n">node_id</span><span class="p">,</span><span class="n">param</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="p">[</span><span class="n">event</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">func</span><span class="p">,</span><span class="n">node_id</span><span class="p">,</span><span class="n">param</span><span class="p">]</span>
+        </div>
+<div class="viewcode-block" id="FilteredTree.callback"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.callback">[docs]</a>    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">neworder</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run a callback.</span>
+
+<span class="sd">        To call callback, the object must be initialized and function exists.</span>
+
+<span class="sd">        @param event: one of added, modified, deleted, reordered, runonce</span>
+<span class="sd">        @param node_id: node_id parameter for callback function</span>
+<span class="sd">        @param path: path parameter for callback function</span>
+<span class="sd">        @param neworder: neworder parameter for reorder callback function</span>
+<span class="sd">        </span>
+<span class="sd">        The runonce event is actually only run once, when a given task appears.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        
+        <span class="k">if</span> <span class="n">event</span> <span class="o">==</span> <span class="s">&#39;added&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">func</span><span class="p">,</span><span class="n">nid</span><span class="p">,</span><span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node_id</span><span class="p">,[]):</span>
+                <span class="k">if</span> <span class="n">nid</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">nid</span><span class="p">):</span>
+                    <span class="n">func</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> is not displayed but </span><span class="si">%s</span><span class="s"> was added&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">nid</span><span class="p">,</span><span class="n">node_id</span><span class="p">))</span>
+        <span class="n">func</span><span class="p">,</span><span class="n">nid</span><span class="p">,</span><span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cllbcks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="bp">None</span><span class="p">,</span><span class="bp">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">func</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">neworder</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">neworder</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span><span class="n">path</span><span class="p">)</span>
+                    
+
+<span class="c">#### EXTERNAL MODIFICATION ####################################################</span></div>
+    <span class="k">def</span> <span class="nf">__external_modify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s">&quot;both&quot;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__update_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;update the node node_id and propagate the </span>
+<span class="sd">        change in direction (up|down|both) &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="n">current_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+        <span class="n">new_display</span><span class="p">,</span> <span class="n">intransparent_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_displayed_by_transparency</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="c"># Update counting cache</span>
+        <span class="k">if</span> <span class="n">intransparent_display</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fcname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">fcname</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filt</span> <span class="ow">and</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fcname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">fcname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">])</span>
+
+        <span class="n">completely_updated</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_display</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">new_display</span><span class="p">:</span>
+            <span class="c"># If a task is not displayed and should not be displayed, we</span>
+            <span class="c"># should still check its parent because he might not be aware</span>
+            <span class="c"># that he has a child</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_parents</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="s">&quot;up&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">completely_updated</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">current_display</span> <span class="ow">and</span> <span class="n">new_display</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s">&#39;added&#39;</span>
+        <span class="k">elif</span> <span class="n">current_display</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">new_display</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s">&#39;deleted&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="s">&#39;modified&#39;</span>
+
+        <span class="c"># Create node info for new node</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;added&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;parents&#39;</span><span class="p">:[],</span> <span class="s">&#39;children&#39;</span><span class="p">:[]}</span>
+
+        <span class="c"># Make sure parents are okay if we adding or updating</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;added&#39;</span> <span class="ow">or</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;modified&#39;</span><span class="p">:</span>
+            <span class="n">current_parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]</span>
+            <span class="n">new_parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__node_parents</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+            <span class="c"># When using flat filter or a recursive filter, FilteredTree</span>
+            <span class="c"># might not recognize a parent correctly, make sure to check them</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;added&#39;</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_parents</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_parents</span> <span class="ow">and</span> <span class="n">parent_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_parents</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s">&quot;up&quot;</span><span class="p">)</span>
+
+            <span class="c"># Refresh list of parents after doing checkup once again</span>
+            <span class="n">current_parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]</span>
+            <span class="n">new_parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__node_parents</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                    
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">parent_id</span> <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="n">new_parents</span>
+                <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+
+            <span class="n">remove_from</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">current_parents</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">new_parents</span><span class="p">))</span>
+            <span class="n">add_to</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">new_parents</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_parents</span><span class="p">))</span>
+            <span class="n">stay</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">new_parents</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">add_to</span><span class="p">))</span>
+
+            <span class="c">#If we are updating a node at the root, we should take care</span>
+            <span class="c">#of the root too</span>
+            <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;down&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span> <span class="ow">in</span> <span class="n">add_to</span><span class="p">:</span>
+                <span class="n">direction</span> <span class="o">=</span> <span class="s">&quot;both&quot;</span>
+
+            <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="n">remove_from</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_remove_tree</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;both&quot;</span> <span class="ow">or</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;up&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s">&quot;up&quot;</span><span class="p">)</span>
+            <span class="c">#there might be some optimization here</span>
+            <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="n">add_to</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">send_add_tree</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;both&quot;</span> <span class="ow">or</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;up&quot;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s">&quot;up&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">completely_updated</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;We have a parent not in the ViewTree&quot;</span><span class="p">)</span>
+            <span class="c">#We update all the other parents</span>
+            <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;both&quot;</span> <span class="ow">or</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;up&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="n">stay</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s">&quot;up&quot;</span><span class="p">)</span>
+            <span class="c">#We update the node itself     </span>
+            <span class="c">#Why should we call the callback only for modify?</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;modified&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> 
+            
+            <span class="c">#We update the children</span>
+            <span class="n">current_children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]</span>
+            <span class="n">new_children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__node_children</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;both&quot;</span> <span class="ow">or</span> <span class="n">direction</span> <span class="o">==</span> <span class="s">&quot;down&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">new_children</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">cid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_children</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">cid</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s">&quot;down&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;deleted&#39;</span><span class="p">:</span>
+            <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_remove_tree</span><span class="p">(</span><span class="n">child_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">child_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">child_id</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s">&quot;down&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+            <span class="c"># Remove node from cache</span>
+            <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s">&quot;up&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+            <span class="c"># We update parents who are not displayed</span>
+            <span class="c"># If the node is only hidden and still exists in the tree</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_parents</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">parent</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s">&quot;up&quot;</span><span class="p">)</span>
+                
+        <span class="k">return</span> <span class="n">completely_updated</span>
+
+<div class="viewcode-block" id="FilteredTree.send_add_tree"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.send_add_tree">[docs]</a>    <span class="k">def</span> <span class="nf">send_add_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">)</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="p">[(</span><span class="n">node_id</span><span class="p">,</span> <span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="p">))]</span>
+
+        <span class="k">while</span> <span class="n">queue</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">node_id</span><span class="p">,</span> <span class="n">relative_path</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">start_path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">start_path</span> <span class="o">+</span> <span class="n">relative_path</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="s">&#39;added&#39;</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]:</span>
+                <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">child_id</span><span class="p">,</span> <span class="n">relative_path</span> <span class="o">+</span> <span class="p">(</span><span class="n">child_id</span><span class="p">,)))</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.send_remove_tree"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.send_remove_tree">[docs]</a>    <span class="k">def</span> <span class="nf">send_remove_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">)</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[(</span><span class="n">node_id</span><span class="p">,</span> <span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="p">),</span> <span class="bp">True</span><span class="p">)]</span>
+
+        <span class="k">while</span> <span class="n">stack</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">node_id</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="n">first_time</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">first_time</span><span class="p">:</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_id</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="bp">False</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]:</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">child_id</span><span class="p">,</span> <span class="n">relative_path</span> <span class="o">+</span> <span class="p">(</span><span class="n">child_id</span><span class="p">,),</span> <span class="bp">True</span><span class="p">))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">start_path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">start_path</span> <span class="o">+</span> <span class="n">relative_path</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="s">&#39;deleted&#39;</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.test_validity"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.test_validity">[docs]</a>    <span class="k">def</span> <span class="nf">test_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]:</span>
+                <span class="k">assert</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">],</span> <span class="s">&quot;Node &#39;</span><span class="si">%s</span><span class="s">&#39; is not in children of &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[]:</span>
+                <span class="k">assert</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">,</span> <span class="s">&quot;Node &#39;</span><span class="si">%s</span><span class="s">&#39; does not have parents&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]:</span>
+                <span class="k">assert</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">],</span> <span class="s">&quot;Node &#39;</span><span class="si">%s</span><span class="s">&#39; is not in parents of &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">)</span>
+
+
+<span class="c">#### OTHER ####################################################################</span></div>
+<div class="viewcode-block" id="FilteredTree.refilter"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.refilter">[docs]</a>    <span class="k">def</span> <span class="nf">refilter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Find out it there is at least one flat filter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__flat</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">:</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">filt</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flat</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__flat</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_flat</span><span class="p">()</span>
+
+        <span class="c"># Clean the tree</span>
+        <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_remove_tree</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;parents&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;children&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="c"># Build tree again</span>
+        <span class="n">root_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_root</span><span class="p">()</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="n">root_node</span><span class="o">.</span><span class="n">get_children</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="n">queue</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c"># FIXME: decide which is the best direction</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__update_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s">&quot;both&quot;</span><span class="p">)</span>
+
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_children</span><span class="p">():</span>
+                <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_id</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__is_displayed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Should be node displayed regardless of its current status? &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filt</span><span class="p">:</span>
+                    <span class="n">can_be_displayed</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">can_be_displayed</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__is_displayed_by_transparency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Should be node displayed regardless of its current status? &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span>
+
+        <span class="n">all_filters</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">intransparent_filters</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">for</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">:</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">filt</span><span class="p">:</span>
+                <span class="n">can_be_displayed</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">can_be_displayed</span><span class="p">:</span>
+                    <span class="n">all_filters</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_transparent</span><span class="p">():</span>
+                        <span class="n">intransparent_filters</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># Missing filters =&gt; not showed at all</span>
+                <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span>
+
+        <span class="k">return</span> <span class="n">all_filters</span><span class="p">,</span> <span class="n">intransparent_filters</span>
+
+<div class="viewcode-block" id="FilteredTree.is_displayed"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.is_displayed">[docs]</a>    <span class="k">def</span> <span class="nf">is_displayed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Is the node displayed at the moment? &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
+</div>
+    <span class="k">def</span> <span class="nf">__node_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Requesting children for root node&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flat</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">node</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">toreturn</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_children</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_displayed</span><span class="p">(</span><span class="n">child_id</span><span class="p">):</span>
+                <span class="n">toreturn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">toreturn</span>
+
+    <span class="k">def</span> <span class="nf">__node_parents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns parents of the given node. If node has no parent or </span>
+<span class="sd">        no displyed parent, return the virtual root.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Requested a parent of the root node&quot;</span><span class="p">)</span>
+
+        <span class="n">parents_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#we return only parents that are not root and displayed</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flat</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_parents</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_displayed</span><span class="p">(</span><span class="n">parent_id</span><span class="p">):</span>
+                    <span class="n">parents_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent_id</span><span class="p">)</span>
+
+        <span class="c"># Add to root if it is an orphan</span>
+        <span class="k">if</span> <span class="n">parents_nodes</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">parents_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">parents_nodes</span>
+        
+    <span class="c">#This is a crude hack which is more performant that other methods</span>
+<div class="viewcode-block" id="FilteredTree.is_path_valid"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.is_path_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_path_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+<span class="c">#        print &quot;is %s valid?&quot; %str(p)</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">valid</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">par</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">par</span><span class="p">):</span>
+                    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">par</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">valid</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.get_paths_for_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.get_paths_for_node">[docs]</a>    <span class="k">def</span> <span class="nf">get_paths_for_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+<span class="c">#        cached = self.cache_paths.get(node_id,None)</span>
+        <span class="c">#The cache improves performance a lot for &quot;stairs&quot;</span>
+        <span class="c">#FIXME : the cache cannot detect if a new path has been added</span>
+<span class="c">#        validcache = False</span>
+<span class="c">#        if cached:</span>
+<span class="c">#            validcache = True</span>
+<span class="c">#            for p in cached:</span>
+<span class="c">#                validcache = validcache and self.is_path_valid(p)</span>
+<span class="c">#            if validcache:</span>
+<span class="c">##                print &quot;the valid cache is : %s&quot; %str(cached)</span>
+<span class="c">#                return cached</span>
+
+        
+        <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">toreturn</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Parent </span><span class="si">%s</span><span class="s"> does not exists&quot;</span> <span class="o">%</span> <span class="n">parent_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]:</span>
+                    <span class="c"># Dump also state of FilteredTree =&gt; useful for debugging</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Current tree:</span><span class="se">\n</span><span class="s">&quot;</span>
+                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                        <span class="n">s</span> <span class="o">+=</span> <span class="n">key</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+                        <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> parents&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+                        <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> children&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> is not children of </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+
+                <span class="k">for</span> <span class="n">parent_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">parent_id</span><span class="p">):</span>
+                    <span class="n">mypath</span> <span class="o">=</span> <span class="n">parent_path</span> <span class="o">+</span> <span class="p">(</span><span class="n">node_id</span><span class="p">,)</span>
+                    <span class="n">toreturn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mypath</span><span class="p">)</span>
+<span class="c">#            #Testing the cache</span>
+<span class="c">#            if validcache and toreturn != cached:</span>
+<span class="c">#                print &quot;We return %s but %s was cached&quot; %(str(toreturn),str(cached))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_paths</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">toreturn</span>
+            <span class="k">return</span> <span class="n">toreturn</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.print_tree"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.print_tree">[docs]</a>    <span class="k">def</span> <span class="nf">print_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Representation of tree in FilteredTree</span>
+<span class="sd">        </span>
+<span class="sd">        @param string: if set, instead of printing, return string for printing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)]</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="s">&quot;_&quot;</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="s">&quot;FilteredTree cache</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="s">&quot;_&quot;</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+
+        <span class="k">while</span> <span class="n">stack</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">node_id</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+            <span class="n">output</span> <span class="o">+=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+
+            <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]):</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">child_id</span><span class="p">,</span> <span class="n">prefix</span><span class="o">+</span><span class="s">&quot; &quot;</span><span class="p">))</span>
+
+        <span class="n">output</span> <span class="o">+=</span> <span class="s">&quot;_&quot;</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+
+        <span class="k">if</span> <span class="n">string</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">output</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">output</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.get_all_nodes"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.get_all_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nodes</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.get_n_nodes"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.get_n_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">withfilters</span><span class="o">=</span><span class="p">[],</span> <span class="n">include_transparent</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns quantity of displayed nodes in this tree</span>
+<span class="sd">        if the withfilters is set, returns the quantity of nodes</span>
+<span class="sd">        that will be displayed if we apply those filters to the current</span>
+<span class="sd">        tree. It means that the currently applied filters are also taken into</span>
+<span class="sd">        account.</span>
+<span class="sd">        If include_transparent=False, we only take into account the applied filters</span>
+<span class="sd">        that doesn&#39;t have the transparent parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">withfilters</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">include_transparent</span><span class="p">:</span>
+            <span class="c"># Use current cache</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">withfilters</span> <span class="o">!=</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">include_transparent</span><span class="p">:</span>
+            <span class="c"># Filter on the current nodes</span>
+
+            <span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="n">withfilters</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filt</span><span class="p">:</span>
+                    <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filt</span><span class="p">)</span>
+
+            <span class="n">total_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">displayed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+                    <span class="n">displayed</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">displayed</span><span class="p">:</span>
+                        <span class="k">break</span>
+                
+                <span class="k">if</span> <span class="n">displayed</span><span class="p">:</span>
+                    <span class="n">total_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">total_count</span>
+        <span class="c">#FIXME maybe allow caching multiple withfilters...</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">withfilters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">withfilters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">withfilters</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s">&#39;count&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Recompute every node</span>
+            <span class="n">build_cache</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">withfilters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">build_cache</span><span class="p">:</span>
+                <span class="n">ffname</span> <span class="o">=</span> <span class="n">withfilters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">ffname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;nodes&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">()}</span>
+
+            <span class="c"># 1st step: build list of filters</span>
+            <span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">filt</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c"># Skip transparent filters if needed</span>
+                <span class="n">transparent</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_transparent</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">include_transparent</span> <span class="ow">and</span> <span class="n">transparent</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filt</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="n">withfilters</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filt</span><span class="p">:</span>
+                    <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filt</span><span class="p">)</span>
+
+            <span class="n">total_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">get_all_nodes</span><span class="p">():</span>
+                <span class="n">displayed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+                    <span class="n">displayed</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">is_displayed</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">displayed</span><span class="p">:</span>
+                        <span class="k">break</span>
+                
+                <span class="k">if</span> <span class="n">displayed</span><span class="p">:</span>
+                    <span class="n">total_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">build_cache</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">ffname</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">build_cache</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filter_cache</span><span class="p">[</span><span class="n">ffname</span><span class="p">][</span><span class="s">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_count</span>
+
+            <span class="k">return</span> <span class="n">total_count</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.get_node_for_path"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.get_node_for_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_for_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span> <span class="ow">or</span> <span class="n">path</span> <span class="o">==</span> <span class="p">():</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">node_id</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c">#Both &quot;if&quot; should be benchmarked</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_paths_for_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+<span class="c">#        if self.is_path_valid(path):</span>
+            <span class="k">return</span> <span class="n">node_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.next_node"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.next_node">[docs]</a>    <span class="k">def</span> <span class="nf">next_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Calling next_node on the root node&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Node {0} is not displayed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_id</span><span class="p">))</span>
+
+        <span class="n">parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_id</span><span class="p">:</span>
+            <span class="n">parent_id</span> <span class="o">=</span> <span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">parent_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s">&quot;Node {0} does not have parent {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">][</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.node_all_children"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.node_all_children">[docs]</a>    <span class="k">def</span> <span class="nf">node_all_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.node_has_child"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.node_has_child">[docs]</a>    <span class="k">def</span> <span class="nf">node_has_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.node_n_children"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.node_n_children">[docs]</a>    <span class="k">def</span> <span class="nf">node_n_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">node_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="c">#We avoid recursion in a loop</span>
+            <span class="c">#because the dict might be updated in the meantime</span>
+            <span class="n">cids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">])</span>   
+            <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">cids</span><span class="p">:</span> 
+                <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_n_children</span><span class="p">(</span><span class="n">cid</span><span class="p">,</span><span class="n">recursive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c">#we count the node itself ofcourse</span>
+            <span class="k">return</span> <span class="n">total</span>  
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.node_nth_child"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.node_nth_child">[docs]</a>    <span class="k">def</span> <span class="nf">node_nth_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">][</span><span class="n">n</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.node_parents"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.node_parents">[docs]</a>    <span class="k">def</span> <span class="nf">node_parents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;Node </span><span class="si">%s</span><span class="s"> is not displayed&#39;</span> <span class="o">%</span> <span class="n">node_id</span><span class="p">)</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">][</span><span class="s">&#39;parents&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">:</span>
+            <span class="n">parents</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parents</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.get_current_state"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.get_current_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Allows to connect LibLarch widget on fly to FilteredTree</span>
+
+<span class="sd">        Sends &#39;added&#39; signal/callback for every nodes that is currently</span>
+<span class="sd">        in FilteredTree. After that, FilteredTree and TreeModel are</span>
+<span class="sd">        in the same state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">][</span><span class="s">&#39;children&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_add_tree</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_id</span><span class="p">)</span>
+
+<span class="c">#### FILTERS ##################################################################</span></div>
+<div class="viewcode-block" id="FilteredTree.list_applied_filters"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.list_applied_filters">[docs]</a>    <span class="k">def</span> <span class="nf">list_applied_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.apply_filter"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.apply_filter">[docs]</a>    <span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> \
+                    <span class="n">reset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a new filter to the tree.</span>
+
+<span class="sd">        :filter_name: The name of an registrered filter from filters_bank</span>
+<span class="sd">        :parameters: Optional parameters to pass to the filter</span>
+<span class="sd">        :reset: Should other filters be removed?</span>
+<span class="sd">        :refresh: Should be refereshed the whole tree?</span>
+<span class="sd">                  (performance optimization)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">filt</span><span class="p">:</span>
+                <span class="n">filt</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No filter of name </span><span class="si">%s</span><span class="s"> in the bank&quot;</span> <span class="o">%</span> <span class="n">filter_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filter_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">refresh</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">refilter</span><span class="p">()</span>
+            <span class="n">toreturn</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">toreturn</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">return</span> <span class="n">toreturn</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.unapply_filter"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.unapply_filter">[docs]</a>    <span class="k">def</span> <span class="nf">unapply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes a filter from the tree.</span>
+
+<span class="sd">        :filter_name: The name of an already added filter to remove</span>
+<span class="sd">        :refresh: Should be refereshed the whole tree?</span>
+<span class="sd">                  (performance optimization)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filter_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">refresh</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">refilter</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="FilteredTree.reset_filters"><a class="viewcode-back" href="../../liblarch.html#liblarch.filteredtree.FilteredTree.reset_filters">[docs]</a>    <span class="k">def</span> <span class="nf">reset_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">transparent_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clears all filters currently set on the tree.  Can&#39;t be called on </span>
+<span class="sd">        the main tree.</span>
+<span class="sd">        Remove only transparents filters if transparent_only is True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transparent_only</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="p">):</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fbank</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filt</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">filt</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">(</span><span class="s">&#39;transparent&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;bank is </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span>
+                    <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;Applied filter </span><span class="si">%s</span><span class="s"> doesnt&#39;</span> <span class="o">%</span><span class="n">f</span> <span class="o">+</span>\
+                                    <span class="s">&#39;exist anymore in the bank&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">applied_filters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">refresh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refilter</span><span class="p">()</span>
+
+<span class="c"># -----------------------------------------------------------------------------</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">liblarch 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Lionel Dricot &amp; Izidor Matušov.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
