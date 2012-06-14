@@ -1,32 +1,27 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    liblarch.treenode
+    ~~~~~~~~~~~~~~~~~
 
-class _Node:
-    """ Object just for a single node in Tree """
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
+
+
+class _Node(object):
+    """
+    Object just for a single node in Tree
+    """
     def __init__(self, node_id, parent=None):
         """ Initializes node
 
-        @param node_id - unique identifier of node (str)
-        @param parent - node_id of parent
+        :node_id: unique identifier of node (str)
+        :parent: node_id of parent
         """
         self.node_id = node_id
-        
+
         self.parents_enabled = True
         self.children_enabled = True
         self.parents = []
@@ -51,10 +46,12 @@ class _Node:
             self.tree.modify_node(self.node_id, priority=priority)
 
     def _set_tree(self, tree):
-        """ Set tree which is should contain this node.
-        
+        """
+        Set tree which is should contain this node.
+
         This method should be called only from MainTree. It is not
-        part of public interface. """
+        part of public interface.
+        """
         self.tree = tree
 
     def get_tree(self):
@@ -67,7 +64,7 @@ class _Node:
             for p in self.get_parents():
                 self.remove_parent(p)
         self.parents_enabled = bol
-        
+
     def has_parents_enabled(self):
         return self.parents_enabled
 
@@ -115,8 +112,8 @@ class _Node:
     def has_parent(self, parent_id=None):
         """ Has parent/parents?
 
-        @param parent_id - None => has any parent?
-            not None => has this parent?
+        :parent_id: None => has any parent?
+                    not None => has this parent?
         """
         if self.parents_enabled:
             if parent_id:
@@ -142,10 +139,10 @@ class _Node:
             for c in self.get_children():
                 self.tree.break_relationship(self.get_id(),c)
         self.children_enabled = bol
-        
+
     def has_children_enabled(self):
         return self.children_enabled
-        
+
     def add_child(self, child_id):
         """ Add a children to node """
         if self.children_enabled and child_id != self.get_id():
@@ -163,10 +160,11 @@ class _Node:
                 print "%s was already in children of %s" % (child_id, self.node_id)
 
     def has_child(self, child_id=None):
-        """ Has child/children?
+        """
+        Has child/children?
 
-        @param child_id - None => has any child?
-            not None => has this child?
+        :child_id: None => has any child?
+                   not None => has this child?
         """
         if self.children_enabled:
             if child_id:

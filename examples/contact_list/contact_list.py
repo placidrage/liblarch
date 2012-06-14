@@ -1,29 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    contact_list
+    ~~~~~~~~~~~~
+
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
 
 #The following code is an example that build a GTK contact-list with liblarch
 #If you have some basic PyGTK experience, the code should be straightforward. 
 
-import sys, gtk
+import sys
+
 #for the CellRenderer
-import cairo, gobject
+from gi.repository import GObject, Gtk, Gdk
+import cairo
 
 #First, we import this liblarch
 sys.path.append("../../../liblarch")
@@ -59,24 +53,24 @@ class NodeContact(TreeNode):
         TreeNode.__init__(self,node_id)
         #A contact cannot have children node. We disable that
         self.set_children_enabled(False)
-        
+
     def get_type(self):
         return "contact"
-        
+
     def set_status(self,status):
         self.status = status
         self.modified()
-        
+
     def get_status(self):
         return self.status
-        
+
     def set_nick(self,nick):
         self.nick = nick
         self.modified()
-        
+
     def get_nick(self):
         return self.nick
-        
+
     def get_label(self):
         #The label is the nickname in bold followed by the XMPP address (small)
         if self.status == "offline":
@@ -85,7 +79,7 @@ class NodeContact(TreeNode):
             label = "<b>%s</b>" %self.nick
         label += " <small><span color='#888'>(%s)</span></small>" %(self.get_id())
         return label
-        
+
 #Each team is also a node
 class NodeTeam(TreeNode):
     def __init__(self,node_id):
@@ -93,48 +87,49 @@ class NodeTeam(TreeNode):
         #A team cannot have parents. This is arbitrarly done for the purpose
         #of this example.
         self.set_parents_enabled(False)
-        
+
     def get_type(self):
         return "team"
-        
+
     def get_label(self):
         return self.get_id()
-        
+
     def get_status(self):
         return None
-        
 
 
-class contact_list_window():
 
-    
+class contact_list_window(object):
     def __init__(self):
         # First we do all the GTK stuff
         # This is not interesting from a liblarch perspective
-        self.window = gtk.Window()
+        self.window = Gtk.Window()
         self.window.set_size_request(300, 600)
         self.window.set_border_width(12)
         self.window.set_title('Liblarch contact-list')
         self.window.connect('destroy', self.quit)
-        vbox = gtk.VBox()
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         vbox.set_spacing(6)
         #A check button to show/hide offline contacts
-        show_offline = gtk.CheckButton("Show offline contacts")
+        show_offline = Gtk.CheckButton("Show offline contacts")
         show_offline.connect("toggled",self.show_offline_contacts)
         vbox.pack_start(show_offline, False, True)
         #The search through contacts
-        search = gtk.Entry()
+        search = Gtk.Entry()
         search.set_icon_from_icon_name(0, "search")
         search.get_buffer().connect("inserted-text",self.search)
         search.get_buffer().connect("deleted-text",self.search)
         vbox.pack_start(search, False, True)
         #The contact list, build with liblarch
-        scrolled_window = gtk.ScrolledWindow()
+        scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.add_with_viewport(self.make_contact_list())
-        scrolled_window.set_policy(gtk.POLICY_NEVER,gtk.POLICY_AUTOMATIC)
+        scrolled_window.set_policy(
+            Gtk.PolicyType.NEVER,
+            Gtk.PolicyType.AUTOMATIC
+        )
         vbox.pack_start(scrolled_window)
         #Status
-        box = gtk.combo_box_new_text()
+        box = Gtk.combo_box_new_text()
         box.append_text("Online")
         box.append_text("Busy")
         box.append_text("Offline")
@@ -143,11 +138,10 @@ class contact_list_window():
         vbox.pack_start(box, False, True)
         self.window.add(vbox)
         self.window.show_all()
-        
-    
+
     #This is the interesting part on how we use liblarch
     def make_contact_list(self):
-    
+
         ##### LIBLARCH TREE CONSTRUCTION
         #First thing, we create a liblarch tree
         self.tree = Tree()
@@ -170,7 +164,7 @@ class contact_list_window():
                 node.add_parent(team_name)
                 #we could also have done
                 #team_node.add_child(contact[0])
-        
+
         ###### LIBLARCH VIEW and FILTER
         #Ok, now we have our liblarch tree. What we need is a view.
         self.view = self.tree.get_viewtree()
@@ -180,7 +174,7 @@ class contact_list_window():
         self.tree.add_filter("search",self.search_filter)
         #And we apply this filter by default
         self.view.apply_filter("online")
-        
+
         ###### LIBLARCH GTK.TreeView
         #And, now, we build our Gtk.TreeView
         #We will build each column of our TreeView
@@ -208,10 +202,9 @@ class contact_list_window():
         col['visible'] = True
         col['order'] = 2
         columns['nick'] = col
-        
-        
+
         return TreeView(self.view,columns)
-    
+
     #This is the "online" filter.
     #It returns the contacts that are busy or online
     #and teams that have at least one contact displayed
@@ -235,7 +228,7 @@ class contact_list_window():
                     return True
             return False
         return True
-        
+
     def show_offline_contacts(self,widget):
         #We should remove the filter to show offline contacts
         if widget.get_active():
@@ -245,14 +238,14 @@ class contact_list_window():
         else:
             self.view.apply_filter('online')
             self.offline = False
-            
+
     def status_changed(self,widget):
         new = widget.get_active_text()
         node = self.tree.get_node('me@myself.com')
         if new == 'Busy': node.set_status('busy')
         elif new == 'Offline': node.set_status('offline')
         else: node.set_status('online')
-        
+
     def search(self,widget,position,char,nchar=None):
         search_string = widget.get_text()
         if len(search_string) > 0:
@@ -268,7 +261,7 @@ class contact_list_window():
             if not self.offline:
                 self.view.apply_filter('online')
             self.view.unapply_filter('search')
-        
+
     def search_filter(self,node,parameters=None):
         string = parameters['search']
         if node.get_type() == "contact":
@@ -278,16 +271,16 @@ class contact_list_window():
                 return False
         else:
             return False
-        
+
     def quit(self, widget):
-        gtk.main_quit()
+        Gtk.main_quit()
 
 
 #The following is a custom CellRenderer that will make a coloured circle
 #This is aboslutely not needed for liblarch.
 #The purpose of using it is to show that liblarch works with 
 #complex cellrenderer too
-class CellRendererTags(gtk.GenericCellRenderer):
+class CellRendererTags(Gtk.GenericCellRenderer):
     __gproperties__ = {
         'status': (gobject.TYPE_PYOBJECT, "Status",\
              "Status", gobject.PARAM_READWRITE),
@@ -317,7 +310,7 @@ class CellRendererTags(gtk.GenericCellRenderer):
         self, window, widget, background_area, cell_area, expose_area, flags):
         # Drawing context
         cr         = window.cairo_create()
-        gdkcontext = gtk.gdk.CairoContext(cr)
+        gdkcontext = Gdk.CairoContext(cr)
         gdkcontext.set_antialias(cairo.ANTIALIAS_NONE)
         # Coordinates of the origin point
         x_align = self.get_property("xalign")
@@ -329,7 +322,7 @@ class CellRendererTags(gtk.GenericCellRenderer):
             color = colours[self.status]
             # Draw circle
             radius = 7
-            my_color = gtk.gdk.color_parse(color)
+            my_color = Gdk.color_parse(color)
             gdkcontext.set_source_color(my_color)
             gdkcontext.arc(rect_x,rect_y+8,radius,90,180)
             gdkcontext.fill()
@@ -352,10 +345,9 @@ class CellRendererTags(gtk.GenericCellRenderer):
 gobject.type_register(CellRendererTags)
 ##### End of the cell renderer
 
-
 #We launch the GTK main_loop
 if __name__ == "__main__":
 #    gobject.threads_init()
     contact_list_window()
-    gtk.main()
+    Gtk.main()
 

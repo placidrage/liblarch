@@ -1,21 +1,13 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    liblarch.__init__
+    ~~~~~~~~~~~~~~~~~
+
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
 
 import functools
 
@@ -44,7 +36,7 @@ def is_compatible(request):
     major, minor = [int(i) for i in request.split(".")]
     current_ma, current_mi = [int(i) for i in API.split(".")]
     return major == current_ma and minor <= current_mi
-    
+
 class TreeNode(_Node):
     """
     The public interface for TreeNode
@@ -200,22 +192,23 @@ class ViewTree(object):
     def __init__(
         self,
         maininterface, maintree, filters_bank,
-        name = None, refresh = True, static = False):
-        """A ViewTree is the interface that should be used to display Tree(s).
+        name=None, refresh=True, static=False):
+        """
+        A ViewTree is the interface that should be used to display Tree(s).
 
-           In static mode, FilteredTree layer is not created. (There is no need)
+        In static mode, FilteredTree layer is not created. (There is no need)
 
-           We connect to MainTree or FilteredTree to get informed about changes.
-           If FilteredTree is used, it is connected to MainTree to handle changes
-           and then send id to ViewTree if it applies.
+        We connect to MainTree or FilteredTree to get informed about changes.
+        If FilteredTree is used, it is connected to MainTree to handle changes
+        and then send id to ViewTree if it applies.
 
-           :param maintree: a Tree object, cointaining all the nodes
-           :param filters_bank: a FiltersBank object. Filters can be added
-                                dinamically to that.
-           :param refresh: if True, this ViewTree is automatically refreshed
-                           after applying a filter.
-           :param static: if True, this is the view of the complete maintree.
-                           Filters cannot be added to such a view.
+        :maintree: a Tree object, cointaining all the nodes
+        :filters_bank: a FiltersBank object. Filters can be added dynamically
+                       to that.
+        :refresh: if True, this ViewTree is automatically refreshed after
+                  applying a filter.
+        :static: if True, this is the view of the complete maintree.
+                 Filters cannot be added to such a view.
         """
         self.maininterface = maininterface
         self.__maintree = maintree
@@ -389,9 +382,11 @@ class ViewTree(object):
             return self._tree.node_all_children(node_id)
 
     def node_n_children(self, node_id=None, recursive=False):
-        """ Return quantity of children of node_id.
+        """
+        Return quantity of children of node_id.
         If node_id is None, use the root node. 
-        Every instance of node has the same children"""
+        Every instance of node has the same children
+        """
         if not self.__ft:
             self.__ft = FilteredTree(self.__maintree, self.__fbank, refresh = True)
         return self.__ft.node_n_children(node_id,recursive)
@@ -425,11 +420,13 @@ class ViewTree(object):
         return len(self.node_parents(node_id)) > 0
 
     def node_parents(self, node_id):
-        """ Returns displayed parents of the given node, or [] if there is no 
+        """
+        Returns displayed parents of the given node, or [] if there is no
         parent (such as if the node is a child of the virtual root),
         or if the parent is not displayable.
-        Doesn't check wheter node node_id is displayed or not. (we only care about
-        parents)
+
+        .. note:: Doesn't check whether node ``node_id`` is displayed or not.
+                  (we only care about parents)
         """
         if self.static:
             return self.__maintree.get_node(node_id).get_parents()
@@ -446,38 +443,43 @@ class ViewTree(object):
 ####### FILTERS ###############################################################
     def list_applied_filters(self):
         return self.__ft.list_applied_filters()
-        
-    def apply_filter(self, filter_name, parameters=None, \
-                     reset=False, refresh=True):
-        """ Applies a new filter to the tree.
 
-        @param filter_name: The name of an already registered filter to apply
-        @param parameters: Optional parameters to pass to the filter
-        @param reset : optional boolean. Should we remove other filters?
-        @param refresh : should we refresh after applying this filter ?
+    def apply_filter(self, filter_name, parameters=None, reset=False, \
+                    refresh=True):
+        """
+        Applies a new filter to the tree.
+
+        :filter_name: The name of an already registered filter to apply
+        :parameters: Optional parameters to pass to the filter
+        :reset: optional boolean. Should we remove other filters?
+        :refresh: should we refresh after applying this filter ?
         """
         if self.static:
-            raise Exception("WARNING: filters cannot be applied" + \
-                            "to a static tree\n")
+            raise Exception(
+                "WARNING: filters cannot be applied to a static tree\n"
+            )
 
         self.__ft.apply_filter(filter_name, parameters, reset, refresh)
 
     def unapply_filter(self,filter_name,refresh=True):
-        """ Removes a filter from the tree.
+        """
+        Removes a filter from the tree.
 
-        @param filter_name: The name of filter to remove
+        :filter_name: The name of filter to remove
         """
         if self.static:
-            raise Exception("WARNING: filters cannot be unapplied" +\
-                            "from a static tree\n")
-        
+            raise Exception(
+                "WARNING: filters cannot be unapplied from a static tree\n"
+            )
+
         self.__ft.unapply_filter(filter_name, refresh)
 
     def reset_filters(self, refresh=True, transparent_only=False):
         """ Remove all filters currently set on the tree. """
         if self.static:
-            raise Exception("WARNING: filters cannot be reset" +\
-                            "on a static tree\n")
+            raise Exception(
+                "WARNING: filters cannot be reset on a static tree\n"
+            )
         else:
              self.__ft.reset_filters(refresh, transparent_only)
 

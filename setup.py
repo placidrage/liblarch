@@ -1,22 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    liblarch setup
+    ~~~~~~~~~~~~~~
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
 
 try:
     from setuptools import setup, find_packages

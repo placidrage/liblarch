@@ -1,21 +1,13 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    liblarch.filteredtree
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
 
 from gi.repository import GObject
 
@@ -40,10 +32,10 @@ class FilteredTree(object):
         """
         Construct a layer where filters could by applied
 
-        @param tree: Original tree to filter.
-        @param filtersbank: Filter bank which stores filters
-        @param refresh: Requests all nodes in the beginning? Additional
-            filters can be added and refresh can be done later
+        :param tree: Original tree to filter.
+        :param filtersbank: Filter bank which stores filters
+        :param refresh: Requests all nodes in the beginning? Additional
+                        filters can be added and refresh can be done later
 
         _flat defines whether only nodes without children can be shown.
         For example WorkView filter.
@@ -58,7 +50,7 @@ class FilteredTree(object):
         if name is None:
             self.root_id = "anonymous_root"
         else:
-            self.root_id = "root_%s" % name
+            self.root_id = "root_{0}".format(name)
 
         self.nodes[self.root_id] = {'parents': [], 'children': []}
         self.cache_paths = {}
@@ -84,8 +76,8 @@ class FilteredTree(object):
         Register a callback for an event.
 
         It is possible to have just one callback for event.
-        @param event: one of added, modified, deleted, reordered
-        @param func: callback function
+        :param event: one of added, modified, deleted, reordered
+        :param func: callback function
         """
         if event == 'runonce':
             if not node_id:
@@ -105,15 +97,14 @@ class FilteredTree(object):
 
         To call callback, the object must be initialized and function exists.
 
-        @param event: one of added, modified, deleted, reordered, runonce
-        @param node_id: node_id parameter for callback function
-        @param path: path parameter for callback function
-        @param neworder: neworder parameter for reorder callback function
+        :param event: one of added, modified, deleted, reordered, runonce
+        :param node_id: node_id parameter for callback function
+        :param path: path parameter for callback function
+        :param neworder: neworder parameter for reorder callback function
         
         The runonce event is actually only run once, when a given task appears.
         """
 
-        
         if event == 'added':
             for func,nid,param in self.cllbcks.get(node_id,[]):
                 if nid and self.is_displayed(nid):
@@ -121,14 +112,18 @@ class FilteredTree(object):
                     if self.cllbcks.has_key(node_id):
                         self.cllbcks.pop(node_id)
                 else:
-                    raise Exception('%s is not displayed but %s was added' %(nid,node_id))
-        func,nid,param = self.cllbcks.get(event, (None,None,None))
+                    raise Exception(
+                        '{0} is not displayed but {1} was added'.format(
+                            nid, node_id
+                        )
+                    )
+
+        func, nid, param = self.cllbcks.get(event, (None, None, None))
         if func:
             if neworder:
-                func(node_id,path,neworder)
+                func(node_id, path, neworder)
             else:
                 func(node_id,path)
-                    
 
 #### EXTERNAL MODIFICATION ####################################################
     def __external_modify(self, node_id):
@@ -360,7 +355,9 @@ class FilteredTree(object):
             return False
 
     def __is_displayed_by_transparency(self, node_id):
-        """ Should be node displayed regardless of its current status? """
+        """
+        Should be node displayed regardless of its current status?
+        """
         if node_id is None or not self.tree.has_node(node_id):
             return False, False
 
@@ -382,7 +379,9 @@ class FilteredTree(object):
         return all_filters, intransparent_filters
 
     def is_displayed(self, node_id):
-        """ Is the node displayed at the moment? """
+        """
+        Is the node displayed at the moment?
+        """
 
         return node_id in self.nodes
 
@@ -409,7 +408,8 @@ class FilteredTree(object):
         return toreturn
 
     def __node_parents(self, node_id):
-        """ Returns parents of the given node. If node has no parent or 
+        """
+        Returns parents of the given node. If node has no parent or 
         no displyed parent, return the virtual root.
         """
         if node_id == self.root_id:
@@ -431,7 +431,7 @@ class FilteredTree(object):
         
     #This is a crude hack which is more performant that other methods
     def is_path_valid(self,p):
-#        print "is %s valid?" %str(p)
+#        print("is {0!s} valid?".format(p))
         valid = True
         i = 0
         if len(p) == 1:
@@ -457,10 +457,9 @@ class FilteredTree(object):
 #            for p in cached:
 #                validcache = validcache and self.is_path_valid(p)
 #            if validcache:
-##                print "the valid cache is : %s" %str(cached)
+##                print("the valid cache is : {0!s}".format(cached))
 #                return cached
 
-        
         if node_id == self.root_id or not self.is_displayed(node_id):
             return [()]
         else:
@@ -482,19 +481,25 @@ class FilteredTree(object):
                     toreturn.append(mypath)
 #            #Testing the cache
 #            if validcache and toreturn != cached:
-#                print "We return %s but %s was cached" %(str(toreturn),str(cached))
+#                print(
+#                    "We return {0!s} but {1!s} was cached".format(
+#                        toreturn, cached
+#                    )
+#                )
+
             self.cache_paths[node_id] = toreturn
             return toreturn
 
     def print_tree(self, string=False):
-        """ Representation of tree in FilteredTree
-        
-        @param string: if set, instead of printing, return string for printing.
+        """
+        Representation of tree in FilteredTree
+
+        :string: if set, instead of printing, return string for printing.
         """
 
         stack = [(self.root_id, "")]
 
-        output = "_"*30 + "\n" + "FilteredTree cache\n" + "_"*30 + "\n"
+        output = "_"*30 + "\nFilteredTree cache\n" + "_"*30 + "\n"
 
         while stack != []:
             node_id, prefix = stack.pop()
@@ -548,7 +553,7 @@ class FilteredTree(object):
                     displayed = filt.is_displayed(node_id)
                     if not displayed:
                         break
-                
+
                 if displayed:
                     total_count += 1
 
@@ -663,14 +668,15 @@ class FilteredTree(object):
 
     def node_parents(self, node_id):
         if node_id not in self.nodes:
-            raise IndexError('Node %s is not displayed' % node_id)
+            raise IndexError('Node {0} is not displayed'.format(node_id))
         parents = list(self.nodes[node_id]['parents'])
         if self.root_id in parents:
             parents.remove(self.root_id)
         return parents
 
     def get_current_state(self):
-        """ Allows to connect LibLarch widget on fly to FilteredTree
+        """
+        Allows to connect LibLarch widget on fly to FilteredTree
 
         Sends 'added' signal/callback for every nodes that is currently
         in FilteredTree. After that, FilteredTree and TreeModel are
@@ -702,7 +708,9 @@ class FilteredTree(object):
             if filt:
                 filt.set_parameters(parameters)
             else:
-                raise ValueError("No filter of name %s in the bank" % filter_name)
+                raise ValueError(
+                    "No filter of name {0} in the bank".format(filter_name)
+                )
 
         if filter_name not in self.applied_filters:
             self.applied_filters.append(filter_name)
@@ -743,9 +751,11 @@ class FilteredTree(object):
                     if filt.get_parameters('transparent'):
                         self.applied_filters.remove(f)
                 else:
-                    print "bank is %s" % self.applied_filters
-                    raise IndexError('Applied filter %s doesnt' %f +\
-                                    'exist anymore in the bank')
+                    print("bank is {0}".format(self.applied_filters)
+                    raise IndexError((
+                        "Applied filter {0} doesn't "
+                        "exist anymore in the bank").format(f)
+                    )
         else:
             self.applied_filters = []
         if refresh:

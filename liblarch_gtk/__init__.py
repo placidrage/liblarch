@@ -1,21 +1,13 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    liblarch_gtk.__init__
+    ~~~~~~~~~~~~~~~~~
+
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
 
 from gi.repository import GObject, Gtk, Gdk
 
@@ -31,7 +23,8 @@ USE_TREEMODELFILTER = False
 BRITGHTNESS_CACHE = {}
 
 def brightness(color_str):
-    """ Compute brightness of a color on scale 0-1
+    """
+    Compute brightness of a color on scale 0-1
 
     Courtesy to
     http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
@@ -46,14 +39,15 @@ def brightness(color_str):
 
 
 class TreeView(Gtk.TreeView):
-    """ Widget which display LibLarch FilteredTree.
+    """
+    Widget which display LibLarch FilteredTree.
 
     This widget extends Gtk.TreeView by several features:
-      * Drag'n'Drop support
-      * Sorting support
-      * separator rows
-      * background color of a row
-      * selection of multiple rows
+    - Drag'n'Drop support
+    - Sorting support
+    - separator rows
+    - background color of a row
+    - selection of multiple rows
     """
 
     __string_signal__ = (GObject.SignalFlags.RUN_FIRST, None, (str, ))
@@ -64,12 +58,12 @@ class TreeView(Gtk.TreeView):
     def __init__(self, tree, description):
         """ Build the widget
 
-        @param  tree - LibLarch FilteredTree
-        @param  description - definition of columns.
+        :tree: LibLarch FilteredTree
+        :description: definition of columns.
 
         Parameters of description dictionary for a column:
-          * value => (type of values, function for generating value from a node)
-          * renderer => (renderer_attribute, renderer object)
+        - value => (type of values, function for generating value from a node)
+        - renderer => (renderer_attribute, renderer object)
 
           Optional:
           * order => specify order of column otherwise use natural oreder
@@ -83,11 +77,16 @@ class TreeView(Gtk.TreeView):
           * sorting_func => use special function for sorting on this func
 
         Example of columns descriptions:
-        description = { 'title': {
-                'value': [str, self.task_title_column],
-                'renderer': ['markup', Gtk.CellRendererText()],
-                'order': 0
-            }}
+
+        .. code-block:: python
+
+            description = {
+                'title': {
+                    'value': [str, self.task_title_column],
+                    'renderer': ['markup', Gtk.CellRendererText()],
+                    'order': 0
+                }
+            }
         """
         Gtk.TreeView.__init__(self)
         self.columns = {}
@@ -183,8 +182,7 @@ class TreeView(Gtk.TreeView):
 
         self.expand_all()
         self.show()
-        
-        
+
         self.collapsed_paths = []
         self.connect('row-expanded', self.__emit, 'expanded')
         self.connect('row-collapsed', self.__emit, 'collapsed')
@@ -219,19 +217,19 @@ class TreeView(Gtk.TreeView):
             iter = treemodel.iter_parent(iter)
         if not self.row_expanded(path) and not collapsed:
             self.expand_row(path, True)
-            
 
     def collapse_node(self, llpath):
-        """ Hide children of a node
-        
+        """
+        Hide children of a node
+
         This method is needed for "rember collapsed nodes" feature of GTG.
         Transform node_id into paths and those paths collapse. By default all
         children are expanded (see self.expand_all())
-        
-        @parameter llpath - LibLarch path to the node. Node_id is extracted
-            as the last parameter and then all instances of that node are
-            collapsed. For retro-compatibility, we take llpath instead of
-            node_id directly
+
+        :llpath: LibLarch path to the node. Node_id is extracted
+                 as the last parameter and then all instances of that node are
+                 collapsed. For retro-compatibility, we take llpath instead of
+                 node_id directly
         """
         node_id = llpath[-1].strip("'")
         if not node_id:
@@ -262,14 +260,18 @@ class TreeView(Gtk.TreeView):
         return self.columns.keys()
 
     def set_main_search_column(self, col_name):
-        """ Set search column for GTK integrate search
-        This is just wrapper to use internal representation of columns"""
+        """
+        Set search column for GTK integrate search
+        This is just wrapper to use internal representation of columns
+        """
         col_num, col = self.columns[col_name]
         self.set_search_column(col_num)
 
     def set_expander_column(self, col_name):
-        """ Set expander column (that which expands through free space)
-        This is just wrapper to use internal representation of columns"""
+        """
+        Set expander column (that which expands through free space)
+        This is just wrapper to use internal representation of columns
+        """
         col_num, col = self.columns[col_name]
         self.set_property("expander-column", col)
 
@@ -291,7 +293,8 @@ class TreeView(Gtk.TreeView):
         col.set_resizable(resizable)
 
     def set_bg_color(self, color_func, color_column):
-        """ Set which column and function for generating background color
+        """
+        Set which column and function for generating background color
 
         Function should be in format func(node, default_color)
         """
@@ -316,7 +319,8 @@ class TreeView(Gtk.TreeView):
             )
 
     def _sort_func(self, model, iter1, iter2, func=None):
-        """ Sort two iterators by function which gets node objects.
+        """
+        Sort two iterators by function which gets node objects.
         This is a simple wrapper which prepares node objects and then
         call comparing function. In other case return default value -1
         """
@@ -336,7 +340,7 @@ class TreeView(Gtk.TreeView):
         Determine background color for cell
 
         Requirements: self.bg_color_column must be set
-        (see self.set_bg_color())
+        (see ``self.set_bg_color()``)
 
         Set background color based on a certain column value.
         """
@@ -361,13 +365,12 @@ class TreeView(Gtk.TreeView):
 
     def set_dnd_name(self, dndname):
         """ Sets Drag'n'Drop name and initialize Drag'n'Drop support
-        
+
         If ENABLE_SORTING, drag_drop signal must be handled by this widget."""
         self.dnd_internal_target = dndname
         self.__init_dnd()
         self.connect('drag_data_get', self.on_drag_data_get)
         self.connect('drag_data_received', self.on_drag_data_received)
-            
 
     def set_dnd_external(self, sourcename, func):
         """ Add a new external target and initialize Drag'n'Drop support"""
@@ -378,22 +381,23 @@ class TreeView(Gtk.TreeView):
         self.__init_dnd()
 
     def __init_dnd(self):
-        """ Initialize Drag'n'Drop support
-        
-        Firstly build list of DND targets:
-            * name
-            * scope - just the same widget / same application
-            * id
+        """
+        Initialize Drag'n'Drop support
 
-        Enable DND by calling enable_model_drag_dest(), 
-        enable_model-drag_source()
+        Firstly build list of DND targets:
+        - name
+        - scope - just the same widget / same application
+        - id
+
+        Enable DND by calling ``enable_model_drag_dest()``, 
+        ``enable_model-drag_source()``
 
         It didnt use support from Gtk.Widget(drag_source_set(),
         drag_dest_set()). To know difference, look in PyGTK FAQ:
         http://faq.pygtk.org/index.py?file=faq13.033.htp&req=show
         """
         self.defer_select = False
-        
+
         if self.dnd_internal_target == '':
             error = 'Cannot initialize DND without a valid name\n'
             error += 'Use set_dnd_name() first'
@@ -431,7 +435,8 @@ class TreeView(Gtk.TreeView):
 
     def on_drag_data_received(self, treeview, context, x, y, selection, info,\
                               timestamp):
-        """ Handle a drop situation.
+        """
+        Handle a drop situation.
 
         First of all, we need to get id of node which should accept
         all draged nodes as their new children. If there is no node,
@@ -441,7 +446,7 @@ class TreeView(Gtk.TreeView):
         Info parameter determines which target was used:
             * info == 0 => internal DND within this TreeView
             * info > 0 => external DND
-        
+
         In case of internal DND we just use Tree.move_node().
         In case of external DND we call function associated with that DND
         set by self.set_dnd_external()

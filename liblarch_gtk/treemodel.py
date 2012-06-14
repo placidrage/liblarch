@@ -1,21 +1,13 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    liblarch_gtk.treemodel
+    ~~~~~~~~~~~~~~~~~
+
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
 
 from gi.repository import Gtk
 
@@ -26,9 +18,11 @@ class TreeModel(Gtk.TreeStore):
     """ Local copy of showed tree """
 
     def __init__(self, tree, types):
-        """ Initializes parent and create list of columns. The first colum
-        is node_id of node """
-        
+        """
+        Initializes parent and create list of columns. The first colum
+        is node_id of node
+        """
+
         self.count = 0
         self.count2 = 0
 
@@ -53,25 +47,29 @@ class TreeModel(Gtk.TreeStore):
             return False
 
     def connect_model(self):
-        """ Register "signals", callbacks from liblarch.
-        
-        Also asks for the current status by providing add_task callback.
-        We are able to connect to liblarch tree on the fly. """
+        """
+        Register "signals", callbacks from liblarch.
 
-        self.tree.register_cllbck('node-added-inview',self.add_task)
-        self.tree.register_cllbck('node-deleted-inview',self.remove_task)
-        self.tree.register_cllbck('node-modified-inview',self.update_task)
-        self.tree.register_cllbck('node-children-reordered',self.reorder_nodes)
+        Also asks for the current status by providing add_task callback.
+        We are able to connect to liblarch tree on the fly.
+        """
+
+        self.tree.register_cllbck('node-added-inview', self.add_task)
+        self.tree.register_cllbck('node-deleted-inview', self.remove_task)
+        self.tree.register_cllbck('node-modified-inview', self.update_task)
+        self.tree.register_cllbck('node-children-reordered', self.reorder_nodes)
 
         # Request the current state
         self.tree.get_current_state()
 
     def my_get_iter(self, path):
-        """ Because we sort the TreeStore, paths in the treestore are
+        """
+        Because we sort the TreeStore, paths in the treestore are
         not the same as paths in the FilteredTree. We do the  conversion here.
-        We receive a Liblarch path as argument and return a Gtk.TreeIter"""
-        #The function is recursive. We take iter for path (A,B,C) in cache.
-        #If there is not, we take iter for path (A,B) and try to find C.
+        We receive a Liblarch path as argument and return a Gtk.TreeIter
+        """
+        # The function is recursive. We take iter for path (A,B,C) in cache.
+        # If there is not, we take iter for path (A,B) and try to find C.
         if path == ():
             return None
         nid = str(path[-1])
@@ -102,7 +100,11 @@ class TreeModel(Gtk.TreeStore):
             self.cache_paths[path] = iter
             toreturn = iter
 #        print "%s / %s" %(self.count2,self.count)
-#        print "my_get_iter %s : %s" %(nid,self.get_string_from_iter(toreturn))
+#        print(
+#            "my_get_iter {0} : {1}".format(
+#                nid, self.get_string_from_iter(toreturn)
+            )
+#        )
         return toreturn
 
     def print_tree(self):
@@ -130,10 +132,11 @@ class TreeModel(Gtk.TreeStore):
 ### INTERFACE TO LIBLARCH #####################################################
 
     def add_task(self, node_id, path):
-        """ Add new instance of node_id to position described at path.
+        """
+        Add new instance of node_id to position described at path.
 
-        @param node_id: identification of task
-        @param path: identification of position
+        :node_id: identification of task
+        :path: identification of position
         """
         node = self.tree.get_node(node_id)
 
@@ -154,24 +157,28 @@ class TreeModel(Gtk.TreeStore):
 #        self.row_has_child_toggled(self.get_path(it), it)
 
     def remove_task(self, node_id, path):
-        """ Remove instance of node.
+        """
+        Remove instance of node.
 
-        @param node_id: identification of task
-        @param path: identification of position
+        :node_id: identification of task
+        :path: identification of position
         """
         it = self.my_get_iter(path)
         if not it:
-            raise Exception("Trying to remove node %s with no iterator"%node_id)
+            raise Exception(
+                "Trying to remove node {0} with no iterator".format(node_id)
+            )
         actual_node_id = self.get_value(it, 0)
         assert actual_node_id == node_id
         self.remove(it)
         self.cache_position.pop(path)
 
     def update_task(self, node_id, path):
-        """ Update instance of node by rebuilding the row.
+        """
+        Update instance of node by rebuilding the row.
 
-        @param node_id: identification of task
-        @param path: identification of position
+        :node_id: identification of task
+        :path: identification of position
         """
         #We cannot assume that the node is in the tree because
         #update is asynchronus
@@ -181,7 +188,7 @@ class TreeModel(Gtk.TreeStore):
             node = self.tree.get_node(node_id)
             #That call to my_get_iter is really slow!
             iterator = self.my_get_iter(path)
-        
+
             if iterator:
                 for column_num, (python_type, access_method) in enumerate(self.types):
                     value = access_method(node)
@@ -189,15 +196,15 @@ class TreeModel(Gtk.TreeStore):
 
     def reorder_nodes(self, node_id, path, neworder):
         """ Reorder nodes.
-        
+
         This is deprecated signal. In the past it was useful for reordering
         showed nodes of tree. It was possible to delete just the last
         element and therefore every element must be moved to the last position
         and then deleted.
 
-        @param node_id: identification of root node
-        @param path: identification of poistion of root node
-        @param neworder: new order of children of root node
+        :node_id: identification of root node
+        :path: identification of poistion of root node
+        :neworder: new order of children of root node
         """
 
         if path is not None:

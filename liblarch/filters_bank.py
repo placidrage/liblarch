@@ -1,28 +1,16 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
-
 """
-filters_bank stores all of GTG's filters in centralized place
+    liblarch.filters_bank
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    filters_bank stores all of GTG's filters in centralized place
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
 """
 
 
-class Filter:
+class Filter(object):
     def __init__(self, func, req):
         self.func = func
         self.dic = {}
@@ -31,7 +19,7 @@ class Filter:
     def set_parameters(self, dic):
         if dic:
             self.dic = dic
-    
+
     def is_displayed(self, node_id):
         if self.tree.has_node(node_id):
             task = self.tree.get_node(node_id)
@@ -47,7 +35,7 @@ class Filter:
             value = not value
 
         return value
-        
+
     def get_parameters(self, param):
         return self.dic.get(param, None)
 
@@ -58,8 +46,9 @@ class Filter:
     def is_transparent(self):
         """ Is this filter transparent? """
         return self.get_parameters('transparent')
-    
-class FiltersBank:
+
+
+class FiltersBank(object):
     """
     Stores filter objects in a centralized place.
     """
@@ -68,18 +57,18 @@ class FiltersBank:
         """
         Create several stock filters:
 
-        workview - Tasks that are active, workable, and started
-        active - Tasks of status Active
-        closed - Tasks of status closed or dismissed
-        notag - Tasks with no tags
+        :workview: Tasks that are active, workable, and started
+        :active: Tasks of status Active
+        :closed: Tasks of status closed or dismissed
+        :notag: Tasks with no tags
         """
         self.tree = tree
         self.available_filters = {}
         self.custom_filters = {}
 
     ##########################################
-        
-    def get_filter(self,filter_name):
+
+    def get_filter(self, filter_name):
         """ Get the filter object for a given name """
         if self.available_filters.has_key(filter_name):
             return self.available_filters[filter_name]
@@ -87,18 +76,19 @@ class FiltersBank:
             return self.custom_filters[filter_name]
         else:
             return None
-    
+
     def list_filters(self):
         """ List, by name, all available filters """
         liste = self.available_filters.keys()
         liste += self.custom_filters.keys()
         return liste
-    
-    def add_filter(self,filter_name,filter_func,parameters=None):
+
+    def add_filter(self, filter_name, filter_func, parameters=None):
         """
         Adds a filter to the filter bank 
-        Return True if the filter was added
-        Return False if the filter_name was already in the bank
+
+        :filter_name: identifies the filter in the bank
+        :returns: True if the filter was added, False if was already in the bank
         """
         if filter_name not in self.list_filters():
             negate = False
@@ -112,8 +102,8 @@ class FiltersBank:
             return True
         else:
             return False
-        
-    def remove_filter(self,filter_name):
+
+    def remove_filter(self, filter_name):
         """
         Remove a filter from the bank.
         Only custom filters that were added here can be removed

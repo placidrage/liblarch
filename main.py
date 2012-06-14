@@ -1,38 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    main
+    ~~~~
+
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
+
+import os
+import uuid
+import sys
+import re
+import logging
+import threading
+from time import sleep, time
+from random import randint, choice, shuffle
 
 from gi.repository import GObject, Gtk
 
 from liblarch import Tree
 from liblarch import TreeNode
 from liblarch_gtk import TreeView
-
-import os
-import uuid
-import sys
-from random import randint, choice, shuffle
-import re
-import logging
-from time import sleep, time
-import threading
-
 
 # Constants
 LOAD_MANY_TASKS_COUNT = 1000
@@ -92,7 +83,7 @@ def save_backup(fun):
         output.close()
 
         return res
-    
+
     if BACKUP_OPERATIONS:
         return _save_backup
     else:
@@ -115,7 +106,10 @@ class TaskNode(TreeNode):
         self.vt = viewtree
 
     def get_label(self):
-        return "%s (%s children)" % (self.label, self.vt.node_n_children(self.tid,recursive=True))
+        return "{0} ({1} children)".format(
+            self.label,
+            self.vt.node_n_children(self.tid,recursive=True)
+        )
 
 class Backend(threading.Thread):
     def __init__(self, backend_id, finish_event, delay, tree):
@@ -248,15 +242,17 @@ class LiblarchDemo(object):
         action_panel = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         action_panel.set_spacing(5)
 
-        button_desc = [('_Add a Task', self.add_task), 
+        button_desc = [
+            ('_Add a Task', self.add_task), 
             ('_Delete a Task', self.delete_task),
             ('_Print Tree', self.print_tree),
             ('_Print FT', self.print_ft),
             ('_Load many Tasks', self.many_tasks),
-            ('_Quit', self.finish)]
+            ('_Quit', self.finish)
+        ]
 
         for name, callback in button_desc:
-            button = Gtk.Button(name)
+            button = Gtk.Button(name, use_underline=True)
             button.connect('clicked', callback)
             action_panel.pack_start(button, expand=True, fill=True, padding=0)
             
@@ -274,7 +270,8 @@ class LiblarchDemo(object):
         usecase_order = 0
         usecase_order_max = 3
 
-        button_desc = [('_Tree high 3', self.tree_high_3),
+        button_desc = [
+            ('_Tree high 3', self.tree_high_3),
             ('Tree high 3 backwards', self.tree_high_3_backwards),
             ('Load from file', self.load_from_file),
             ('Delete DFXBCAE', self.delete_magic),
@@ -282,7 +279,7 @@ class LiblarchDemo(object):
             ('Delete randomly', self.delete_random),
             ('Change task', self.change_task),
             ('_Backend use case', self.backends),
-            ]
+        ]
 
         for name, callback in button_desc:
             if usecase_order <= 0:
@@ -296,7 +293,7 @@ class LiblarchDemo(object):
                 usecase_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 usecase_box.set_spacing(5)
 
-            button = Gtk.Button(name)
+            button = Gtk.Button(name, use_underline=True)
             button.connect('clicked', callback)
             usecase_box.pack_start(button, expand=True, fill=True, padding=0)
 
@@ -340,7 +337,7 @@ class LiblarchDemo(object):
         print
         self.view_tree.print_tree()
         print
-    
+
     @save_backup
     def add_task(self, widget):
         """
@@ -368,7 +365,7 @@ class LiblarchDemo(object):
             for parent_id in selected:
                 task.add_parent(parent_id)
             print('Added task "{0}" ({1})'.format(t_title, t_id))
-            
+
     def apply_filter(self,widget,param):
         print("applying filter: {0}".format(param))
         if param in self.view_tree.list_applied_filters():

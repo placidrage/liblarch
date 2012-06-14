@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Liblarch - a library to handle directed acyclic graphs
-# Copyright (c) 2011-2012 - Lionel Dricot & Izidor Matušov
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
+"""
+    liblarch.processqueue
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    .. todo:: module level docstring should contain description
+
+    :copyright: Copyright (c) 2011-2012 by the liblarch team, see AUTHORS.
+    :license: LGPLv3 or later, see LICENSE for details.
+"""
 
 import threading
 from gi.repository import GObject
+
 
 class SyncQueue(object):
     """
@@ -29,7 +22,7 @@ class SyncQueue(object):
         """
         Initialize synchronized queue.
 
-        @param callback - function for processing requests
+        :callback: function for processing requests
         """
         self._low_queue = []
         self._queue = []
@@ -37,9 +30,9 @@ class SyncQueue(object):
         self._handler = None
         self._lock = threading.Lock()
         self._origin_thread = threading.current_thread()
-        
+
         self.count = 0
-        
+
     def process_queue(self):
         """
         Process requests from queue
@@ -49,7 +42,7 @@ class SyncQueue(object):
             func(*action[1:])
         # return True to process other requests as well
         return True
-        
+
     def push(self, *element, **kwargs):
         """
         Add a new element to the queue.
@@ -87,14 +80,16 @@ class SyncQueue(object):
                 self._handler = GObject.idle_add(self.process_queue)
 
         self._lock.release()
-        
+
     def process(self):
-        """ Return elements to process
-        
+        """
+        Return elements to process
+
         At the moment, it returns just one element. In the future more
         elements may be better to return (to speed it up).
-        
-        If there is no request left, disable processing. """
+
+        If there is no request left, disable processing.
+        """
 
         self._lock.acquire()
         if len(self._vip_queue) > 0:
