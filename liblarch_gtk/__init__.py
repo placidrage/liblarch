@@ -27,7 +27,8 @@ def brightness(color_str):
     Compute brightness of a color on scale 0-1
 
     Courtesy to
-    http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+    http://stackoverflow.com/questions/596216/formula-to-determine-brightness-
+    of-rgb-color
     """
     global BRITGHTNESS_CACHE
 
@@ -71,7 +72,8 @@ class TreeView(Gtk.TreeView):
           * resizable => is the column resizable?
           * visible => is the column visible?
           * title => title of column
-          * new_colum => do not create a separate column, just continue with the previous one
+          * new_colum => do not create a separate column, just continue with
+                the previous one
                 (this can be used to create columns without borders)
           * sorting => allow default sorting on this column
           * sorting_func => use special function for sorting on this func
@@ -111,7 +113,8 @@ class TreeView(Gtk.TreeView):
         col = Gtk.TreeViewColumn()
 
         # Build columns according to the order
-        for col_num, (order_num, col_name) in enumerate(sorted(self.order_of_column), 1):
+        for col_num, (order_num, col_name) in \
+            enumerate(sorted(self.order_of_column), 1):
             desc = description[col_name]
             types.append(desc['value'])
 
@@ -127,7 +130,7 @@ class TreeView(Gtk.TreeView):
 
             # If new_colum=False, do not create new column, use the previous one
             # It will create columns without borders
-            if desc.get('new_column',True):
+            if desc.get('new_column', True):
                 col = Gtk.TreeViewColumn()
                 newcol = True
             else:
@@ -199,7 +202,7 @@ class TreeView(Gtk.TreeView):
         while i <= len(str(path)):
             temp_iter = self.treemodel.get_iter(path[:i])
             ll_path += (self.treemodel.get_value(temp_iter,0),)
-            i+=1
+            i += 1
         if data == 'expanded':
             self.emit('node-expanded', ll_path)
         elif data == 'collapsed':
@@ -248,7 +251,9 @@ class TreeView(Gtk.TreeView):
                 schedule_next = False
 
         if schedule_next:
-            self.basetree.queue_action(node_id, self.collapse_node, param=llpath)
+            self.basetree.queue_action(
+                node_id, self.collapse_node, param=llpath
+            )
 
     def show(self):
         """ Shows the TreeView and connect basetreemodel to LibLarch """
@@ -306,9 +311,11 @@ class TreeView(Gtk.TreeView):
             Transform function from func(node, default_color) into func(node).
             Default color is computed based on some GTK style magic.
             """
-            default = column.get_tree_view().get_style().base[Gtk.StateType.NORMAL]
+            default = column.get_tree_view().get_style().base[
+                Gtk.StateType.NORMAL
+            ]
             return lambda node: func(node, default)
-            
+
         if self.columns.has_key(color_column):
             self.bg_color_column, column = self.columns[color_column]
             func = closure_default_color(color_func, column)
@@ -399,11 +406,17 @@ class TreeView(Gtk.TreeView):
         self.defer_select = False
 
         if self.dnd_internal_target == '':
-            error = 'Cannot initialize DND without a valid name\n'
-            error += 'Use set_dnd_name() first'
+            error = (
+                "Cannot initialize DND without a valid name\n"
+                "Use set_dnd_name() first"
+            )
             raise Exception(error)
-            
-        dnd_targets = [(self.dnd_internal_target, Gtk.TargetFlags.SAME_WIDGET, 0)]
+
+        dnd_targets = [(
+            self.dnd_internal_target,
+            Gtk.TargetFlags.SAME_WIDGET,
+            0
+        )]
         for target in self.dnd_external_targets:
             name = self.dnd_external_targets[target][0]
             dnd_targets.append((name, Gtk.TargetFlags.SAME_APP, target))
@@ -430,10 +443,13 @@ class TreeView(Gtk.TreeView):
         treeselection = treeview.get_selection()
         model, paths = treeselection.get_selected_rows()
         iters = [model.get_iter(path) for path in paths]
-        iter_str = ','.join([model.get_string_from_iter(iter) for iter in iters])
+        iter_str = ','.join([
+            model.get_string_from_iter(iter)
+            for iter in iters
+        ])
         selection.set(self.dnd_internal_target, 0, iter_str)
 
-    def on_drag_data_received(self, treeview, context, x, y, selection, info,\
+    def on_drag_data_received(self, treeview, context, x, y, selection, info, \
                               timestamp):
         """
         Handle a drop situation.
@@ -499,9 +515,9 @@ class TreeView(Gtk.TreeView):
                 try:
                     dragged_iters.append(model.get_iter_from_string(iter))
                 except ValueError:
-                    #I hate to silently fail but we have no choice.
-                    #It means that the iter is not good.
-                    #Thanks shitty gtk API for not allowing us to test the string
+                    # I hate to silently fail but we have no choice.
+                    # It means that the iter is not good.
+                    # Gtk API does not allow us to test the string
                     dragged_iter = None
 
             elif info in self.dnd_external_targets and destination_tid:
@@ -515,7 +531,10 @@ class TreeView(Gtk.TreeView):
                 if dragged_iter and model.iter_is_valid(dragged_iter):
                     dragged_tid = model.get_value(dragged_iter, 0)
                     try:
-                        tree.move_node(dragged_tid, new_parent_id=destination_tid)
+                        tree.move_node(
+                            dragged_tid,
+                            new_parent_id=destination_tid
+                        )
                     except Exception, e:
                         print 'Problem with dragging: {0}'.format(e)
             elif info in self.dnd_external_targets and destination_tid:
@@ -546,7 +565,7 @@ class TreeView(Gtk.TreeView):
             None will disable support for row separators.
         """
         self.separator_func = func
-        Gtk.TreeView.set_row_separator_func(self,self._separator_func)
+        Gtk.TreeView.set_row_separator_func(self, self._separator_func)
 
     ######### Multiple selection ##############################################
     def get_selected_nodes(self):

@@ -751,7 +751,7 @@ class FilteredTree(object):
                     if filt.get_parameters('transparent'):
                         self.applied_filters.remove(f)
                 else:
-                    print("bank is {0}".format(self.applied_filters)
+                    print("bank is {0}".format(self.applied_filters))
                     raise IndexError((
                         "Applied filter {0} doesn't "
                         "exist anymore in the bank").format(f)

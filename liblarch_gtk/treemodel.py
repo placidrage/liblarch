@@ -75,9 +75,9 @@ class TreeModel(Gtk.TreeStore):
         nid = str(path[-1])
         self.count += 1
         #We try to use the cache
-        iter = self.cache_paths.get(path,None)
+        iter = self.cache_paths.get(path, None)
         toreturn = None
-        if iter and self.iter_is_valid(iter) and nid == self.get_value(iter,0):
+        if iter and self.iter_is_valid(iter) and nid == self.get_value(iter, 0):
             self.count2 += 1
             toreturn = iter
         else:
@@ -85,25 +85,25 @@ class TreeModel(Gtk.TreeStore):
             #This is a small ad-hoc optimisation.
             #Instead of going through all the children nodes
             #We go directly at the last known position.
-            pos = self.cache_position.get(path,None)
+            pos = self.cache_position.get(path, None)
             if pos:
-                iter = self.iter_nth_child(root,pos)
-                if iter and self.get_value(iter,0) == nid:
+                iter = self.iter_nth_child(root, pos)
+                if iter and self.get_value(iter, 0) == nid:
                     toreturn = iter
             if not toreturn:
                 if root:
                     iter = self.iter_children(root)
                 else:
                     iter = self.get_iter_first()
-                while iter and self.get_value(iter,0) != nid:
+                while iter and self.get_value(iter, 0) != nid:
                     iter = self.iter_next(iter)
             self.cache_paths[path] = iter
             toreturn = iter
-#        print "%s / %s" %(self.count2,self.count)
+#        print "%s / %s" %(self.count2, self.count)
 #        print(
 #            "my_get_iter {0} : {1}".format(
 #                nid, self.get_string_from_iter(toreturn)
-            )
+#            )
 #        )
         return toreturn
 
